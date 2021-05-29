@@ -57,17 +57,17 @@ public class TranslationManager {
 	 * @param jsonObject
 	 */
 	public void addFromJson(@NotNull JsonObject jsonObject) {
-		for (String regional : jsonObject.keySet()) {
+		for (Entry<String, JsonElement> regional : jsonObject.entrySet()) {
 			TranslationMap translationMap = new TranslationMap();
-			JsonElement jsonElement = jsonObject.get(regional);
+			JsonElement jsonElement = regional.getValue();
 			if (!jsonElement.isJsonObject()) continue;
 			JsonObject jsonObject2 = jsonElement.getAsJsonObject();
-			for (String key : jsonObject2.keySet()) {
-				JsonElement jsonElement2 = jsonObject2.get(key);
+			for (Entry<String, JsonElement> key : jsonObject2.entrySet()) {
+				JsonElement jsonElement2 = key.getValue();
 				if (!jsonElement2.isJsonPrimitive() || !jsonElement2.getAsJsonPrimitive().isString()) continue;
-				translationMap.put(key, jsonElement2.getAsString());
+				translationMap.put(key.getKey(), jsonElement2.getAsString());
 			}
-			translations.put(regional, translationMap);
+			translations.put(regional.getKey(), translationMap);
 		}
 	}
 	

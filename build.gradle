@@ -11,9 +11,8 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-	maven {
-        url = "https://maven.nucleoid.xyz"
-    }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = "https://maven.nucleoid.xyz" }
 }
 
 minecraft {
@@ -34,8 +33,7 @@ dependencies {
 	modImplementation "fr.catcore:server-translations-api:${project.translation_version}"
     include "fr.catcore:server-translations-api:${project.translation_version}"
     
-    //modImplementation 'me.lucko:fabric-permissions-api:${project.permission_version}'
-    //include 'me.lucko:fabric-permissions-api:${project.permission_version}'
+    modImplementation 'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
 	
 }
 
