@@ -17,13 +17,13 @@ public final class TabableSubCommand implements ITabable {
 		this.subCommands = subCommands;
 	}
 	
-	public SubCommand getCustomSubCommandFromName(String name) {
+	public SubCommand getSubCommand(String name) {
 		for (SubCommand subCommand : subCommands) {
-			if (subCommand.getCommandName().equalsIgnoreCase(name)) {
+			if (subCommand.getName().equalsIgnoreCase(name)) {
 				return subCommand;
 			} else {
-				if (subCommand.getCommandAliases()==null || subCommand.getCommandAliases().isEmpty()) continue;
-				for (String s : subCommand.getCommandAliases()) {
+				if (subCommand.getAliases()==null || subCommand.getAliases().isEmpty()) continue;
+				for (String s : subCommand.getAliases()) {
 					if (s.equalsIgnoreCase(name)) {
 						return subCommand;
 					}
@@ -33,13 +33,17 @@ public final class TabableSubCommand implements ITabable {
 		return null;
 	}
 	
+	public SubCommand[] getSubCommands() {
+		return this.subCommands;
+	}
+	
 	@Override
 	public List<Text> getTabable(ServerCommandSource commandSource, String[] params) {
 		List<Text> list = new ArrayList<>();
 		for (SubCommand subCommand : subCommands) {
-			list.add(new LiteralText(subCommand.getCommandName()));
-			if (subCommand.getCommandAliases()!=null) {
-				for (String s : subCommand.getCommandAliases()) {
+			list.add(new LiteralText(subCommand.getName()));
+			if (subCommand.getAliases()!=null) {
+				for (String s : subCommand.getAliases()) {
 					list.add(new LiteralText(s));
 				}
 			}

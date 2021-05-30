@@ -1,5 +1,7 @@
 package com.bb1.api.translations;
 
+import java.lang.reflect.Field;
+
 import com.bb1.api.Loader;
 
 import net.minecraft.text.TranslatableText;
@@ -16,4 +18,15 @@ public final class DefaultTranslations {
 	public static final TranslatableText NEED_ARGUMENTS = Loader.getTranslatableText("error.required_arguments");
 	
 	private DefaultTranslations() {} // So no instance can be made of this class
+	
+	public static final void register() {
+		TranslationManager translationManager = TranslationManager.get();
+		for (Field field : DefaultTranslations.class.getDeclaredFields()) {
+			try {
+				TranslatableText text = (TranslatableText) field.get(null);
+				translationManager.set(text.getKey(), TranslationManager.DEFAULT_LANG, text.getKey());
+			} catch (IllegalArgumentException | IllegalAccessException e) {}
+		}
+	}
+	
 }

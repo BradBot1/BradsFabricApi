@@ -29,6 +29,10 @@ public class TranslationManager {
 		return INSTANCE;
 	}
 	/**
+	 * The language to register translations to if no translations are known
+	 */
+	public static final String DEFAULT_LANG = "unkown";
+	/**
 	 * In the format regional -> translationKey -> value
 	 */
 	private final Map<String, TranslationMap> translations = new HashMap<>();
@@ -69,6 +73,16 @@ public class TranslationManager {
 			}
 			translations.put(regional.getKey(), translationMap);
 		}
+	}
+	
+	public String translate(String translation_key, String lang) {
+		return translations.getOrDefault(lang, new TranslationMap()).get(translation_key);
+	}
+	
+	public void set(String translation_key, String lang, String value) {
+		TranslationMap translationMap = translations.getOrDefault(lang, new TranslationMap());
+		translationMap.put(translation_key, value);
+		translations.put(lang, translationMap);
 	}
 	
 	public void pushAllTranslations(boolean force) {

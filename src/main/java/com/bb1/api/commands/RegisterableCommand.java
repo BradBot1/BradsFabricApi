@@ -11,7 +11,6 @@ import com.bb1.api.translations.DefaultTranslations;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 public class RegisterableCommand {
@@ -26,13 +25,12 @@ public class RegisterableCommand {
 		return c;
 	}
 	
-	public String[] removeBefore(String[] params, int index) {
-		List<String> strings = new ArrayList<>();
-		for (int i = 0; i < params.length; i++) {
-			if (i<=index) continue;
-			strings.add(params[i]);
+	public String[] copyAfter(String[] params, int index) {
+		String[] s = new String[params.length-(index+1)];
+		for (int i = 0; i < s.length; i++) {
+			s[i] = params[i+index+1];
 		}
-		return strings.toArray(new String[strings.size()]);
+		return s;
 	}
 	
 	public int execute(ServerCommandSource commandSource, String commandLabel, String[] args) {
@@ -46,7 +44,8 @@ public class RegisterableCommand {
 				ITabable t = c.getParams()[i];
 				if (t instanceof TabableSubCommand) {
 					TabableSubCommand ts = (TabableSubCommand) t;
-					return ts.getCustomSubCommandFromName(args[i]).execute(commandSource, commandLabel, removeBefore(args, i));
+					for (String s : copyAfter(args, i)) System.err.println(s);
+					return ts.getSubCommand(args[i]).execute(commandSource, commandLabel, copyAfter(args, i));
 				} else {
 					continue;
 				}
@@ -66,7 +65,7 @@ public class RegisterableCommand {
 	
 	public List<Text> tabComplete(ServerCommandSource commandSource, String alias, String[] args) {
 		if (c.getParams()==null || c.getParams().length==0) {
-			return new ArrayList<>();
+			return new ArrayList<Text>();
 		} else {
 			for (int i = 0; i < args.length-1; i++) {
 				try {
@@ -74,13 +73,13 @@ public class RegisterableCommand {
 					if (t instanceof TabableSubCommand) {
 						try {
 							TabableSubCommand t2 = (TabableSubCommand) t;
-							SubCommand s = t2.getCustomSubCommandFromName(args[i]);
+							SubCommand s = t2.getSubCommand(args[i]);
 							ITabable[] t3 = s.getParams();
 							ITabable t4 = t3[args.length-i-2];
 							return t4.getTabable(commandSource, args);
-						} catch (Exception ignore) { return new ArrayList<Text>() {private static final long serialVersionUID = -17124577512450984L;{
-							add(new LiteralText("?"));
-						}};}
+						} catch (Exception ignore) {
+							return new ArrayList<Text>();
+						}
 					}
 				} catch (Exception e) {
 					continue;
@@ -88,9 +87,9 @@ public class RegisterableCommand {
 			}
 			try {
 				return c.getParams()[args.length-1].getTabable(commandSource, args);
-			} catch (Exception ignore) { return new ArrayList<Text>() {private static final long serialVersionUID = -17124577512450984L;{
-				add(new LiteralText("?"));
-			}};}
+			} catch (Exception ignore) {
+				return new ArrayList<Text>();
+			}
 		}
 	}
 }
