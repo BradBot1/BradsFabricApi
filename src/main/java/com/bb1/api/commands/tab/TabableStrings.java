@@ -1,6 +1,7 @@
 package com.bb1.api.commands.tab;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +16,12 @@ public class TabableStrings implements ITabable {
 	private List<Text> string = new ArrayList<>();
 	
 	public TabableStrings(@NotNull String name, @NotNull String... strings) {
+		this.name = name;
+		for (String s : strings) 
+			this.string.add(new LiteralText(s));
+	}
+	
+	public TabableStrings(@NotNull String name, @NotNull Collection<String> strings) {
 		this.name = name;
 		for (String s : strings) 
 			this.string.add(new LiteralText(s));

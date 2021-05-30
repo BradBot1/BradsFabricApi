@@ -1,8 +1,8 @@
 package com.bb1.api;
 
-import com.bb1.api.commands.Command;
-import com.bb1.api.commands.tab.ITabable;
-import com.bb1.api.commands.tab.TabableString;
+import com.bb1.api.permissions.DefaultPermissions;
+import com.bb1.api.permissions.PermissionManager;
+import com.bb1.api.permissions.command.PermissionCommand;
 import com.bb1.api.translations.DefaultTranslations;
 import com.bb1.api.translations.TranslationManager;
 import com.bb1.api.translations.command.TranslationCommand;
@@ -13,7 +13,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 /**
  * Copyright 2021 BradBot_1
@@ -64,40 +63,27 @@ public class Loader implements DedicatedServerModInitializer, TranslationsReload
 		return null;
 	}
 	
+	public static ApiConfig config = new ApiConfig();
+	
 	@Override
 	public void onInitializeServer() {
+		config.load();
+		// Load translations
 		DefaultTranslations.register();
+		TranslationManager.get().pushAllTranslations(true);
+		// Load commands
 		registerCommands();
 	}
 	
+	protected void loadPermissions() {
+		// Add all permissions to the set
+		DefaultPermissions.load();
+		if (config.loadPermissionModule) PermissionManager.get().registerEvent();
+	}
+	
 	protected void registerCommands() {
-		new TranslationCommand().register();
-		
-		new Command("test") {
-			
-			public int execute(ServerCommandSource source, String alias, String[] params) {
-				source.sendFeedback(new LiteralText(""+params.length), false);
-				return 1;
-			}
-			
-			public ITabable[] getParams() {
-				return new ITabable[] {new TabableString("a"), new TabableString("b"), new TabableString("c"), new TabableString("d")};
-			};
-			
-		}.register();
-		
-		new Command("test2") {
-			
-			public int execute(ServerCommandSource source, String alias, String[] params) {
-				source.sendFeedback(new LiteralText(""+params.length), false);
-				return 1;
-			}
-			
-			public ITabable[] getParams() {
-				return new ITabable[] {new TabableString("a")};
-			};
-			
-		}.register();
+		if (config.loadTranslationCommand) new TranslationCommand().register();
+		if (config.loadPermissionCommand && config.loadPermissionModule) new PermissionCommand().register();
 	}
 	/**
 	 * Called when translations should be reloaded

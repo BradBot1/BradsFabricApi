@@ -20,9 +20,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 /**
- * Any class that extends this one can have all its values saved
- * 
- * It saves like this:
+ * Look at <i>Config.md</i> for instructions and more information
  */
 public abstract class Config {
 	

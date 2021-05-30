@@ -8,6 +8,9 @@ import java.lang.annotation.Target;
 
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A way to identify what fields should be saved in a {@link Config}
+ */
 @Retention(RUNTIME)
 @Target(FIELD)
 public @interface Storable {

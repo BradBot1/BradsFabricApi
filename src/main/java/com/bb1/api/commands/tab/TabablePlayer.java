@@ -12,6 +12,10 @@ import net.minecraft.text.Text;
 
 public class TabablePlayer implements ITabable {
 	
+	public TabablePlayer() {
+		
+	}
+	
 	public List<Text> getPlayerNames() {
 		List<Text> list = new ArrayList<>();
 		for (ServerPlayerEntity serverPlayerEntity : Loader.getMinecraftServer().getPlayerManager().getPlayerList()) {

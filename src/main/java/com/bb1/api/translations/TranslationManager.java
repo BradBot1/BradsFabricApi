@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
 import fr.catcore.server.translations.api.ServerTranslations;
 import fr.catcore.server.translations.api.resource.language.TranslationMap;
 
-public class TranslationManager {
+public final class TranslationManager {
 	/**
 	 * The instance of {@link ServerTranslations} that we use to modify translations
 	 */
@@ -37,11 +37,7 @@ public class TranslationManager {
 	 */
 	private final Map<String, TranslationMap> translations = new HashMap<>();
 	
-	public TranslationManager() {
-		if (INSTANCE!=null && !INSTANCE.equals(this)) {
-			throw new IllegalStateException("TranslationManager cannot be instanced twice");
-		}
-	}
+	private TranslationManager() {}
 	/**
 	 * Converts the translation list to json
 	 */
