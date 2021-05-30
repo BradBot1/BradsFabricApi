@@ -62,7 +62,6 @@ public final class CommandManager {
 					String[] split = given.split(" ");
 					if (!split[0].startsWith("/")) return 0;
 					final String commandName = split[0].replaceFirst("/", "");
-					System.err.println("a");
 					return registerableCommand.execute(context.getSource(), commandName, given.replaceFirst("/"+commandName+" ", "").split(" "));
 				});
 				dispatcher.register(lab);

@@ -1,6 +1,8 @@
 package com.bb1.api.translations;
 
 import com.bb1.api.commands.Command;
+import com.bb1.api.commands.tab.ITabable;
+import com.bb1.api.commands.tab.TabableString;
 
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.TranslatableText;
@@ -25,6 +27,11 @@ public final class TranslationCommand extends Command {
 		}
 		source.sendFeedback(new TranslatableText(params[0]), false);
 		return 1;
+	}
+	
+	@Override
+	public ITabable[] getParams() {
+		return new ITabable[] {new TabableString("translation_key")};
 	}
 	
 }

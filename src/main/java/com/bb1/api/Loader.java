@@ -1,21 +1,14 @@
 package com.bb1.api;
 
-import com.bb1.api.commands.Command;
-import com.bb1.api.commands.SubCommand;
-import com.bb1.api.commands.tab.ITabable;
-import com.bb1.api.commands.tab.TabablePlayer;
-import com.bb1.api.commands.tab.TabableString;
-import com.bb1.api.commands.tab.TabableStrings;
-import com.bb1.api.commands.tab.TabableSubCommand;
 import com.bb1.api.translations.TranslationCommand;
 import com.bb1.api.translations.TranslationManager;
 
 import fr.catcore.server.translations.api.resource.language.TranslationsReloadListener;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 /**
  * Copyright 2021 BradBot_1
@@ -51,6 +44,13 @@ public class Loader implements DedicatedServerModInitializer, TranslationsReload
 	public static MinecraftServer getMinecraftServer() {
 		return minecraftServer;
 	}
+	/**
+	 * Returns the servers root directory
+	 */
+	public static String getRootPath() {
+		final String path = PlayerManager.OPERATORS_FILE.getAbsolutePath();
+		return path.endsWith("/") ? path.substring(0, path.length()-10) : path.substring(0, path.length()-9);
+	}
 	
 	public static ServerPlayerEntity getServerPlayerEntity(ServerCommandSource source) {
 		try {
@@ -61,81 +61,6 @@ public class Loader implements DedicatedServerModInitializer, TranslationsReload
 	
 	@Override
 	public void onInitializeServer() {
-		
-		SubCommand a = new SubCommand() {
-			
-			@Override
-			public int execute(ServerCommandSource source, String alias, String[] params) {
-				source.sendFeedback(new LiteralText("a"), false);
-				return 0;
-			}
-			
-			@Override
-			public String getCommandUsage() {
-				return "";
-			}
-			
-			@Override
-			public String getCommandName() {
-				return "a";
-			}
-			
-			@Override
-			public ITabable[] getParams() {
-				return new ITabable[] {new TabableStrings("owo", "hi", "ayo", ":)"), new TabableString("q"), new TabableString("e")};
-			}
-			
-		};
-		
-		SubCommand b = new SubCommand() {
-			
-			@Override
-			public int execute(ServerCommandSource source, String alias, String[] params) {
-				source.sendFeedback(new LiteralText("b"), false);
-				return 0;
-			}
-			
-			@Override
-			public String getCommandUsage() {
-				return "";
-			}
-			
-			@Override
-			public String getCommandName() {
-				return "b";
-			}
-			
-			@Override
-			public ITabable[] getParams() {
-				return new ITabable[] {new TabablePlayer()};
-			}
-			
-		};
-		
-		new Command() {
-
-			@Override
-			public int execute(ServerCommandSource source, String alias, String[] params) {
-				source.sendFeedback(new LiteralText("ayo!" + params.length), false);
-				return 1;
-			}
-
-			@Override
-			public String getName() {
-				return "test";
-			}
-
-			@Override
-			public String getDescription() {
-				return "A test command";
-			}
-			
-			public ITabable[] getParams() {
-				return new ITabable[] {new TabableSubCommand(a,b)};
-			}
-			
-		}.register();
-		
 		registerCommands();
 	}
 	
