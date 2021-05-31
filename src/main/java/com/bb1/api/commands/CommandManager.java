@@ -33,7 +33,7 @@ public final class CommandManager {
 			for (RegisterableCommand registerableCommand : commands) {
 				final Command command = registerableCommand.getInner();
 				LiteralArgumentBuilder<ServerCommandSource> lab = LiteralArgumentBuilder.literal(command.getName());
-				lab.then(addOn(32, command.getParams(), registerableCommand));
+				lab.then(addOn(command.getParams(), registerableCommand));
 				lab.executes(context -> {
 					final String given = context.getInput();
 					String[] split = given.split(" ");
@@ -51,7 +51,7 @@ public final class CommandManager {
 		});
 	}
 	
-	protected RequiredArgumentBuilder<ServerCommandSource, String> addOn(int size, @Nullable ITabable[] tabs, RegisterableCommand registerableCommand) {
+	protected RequiredArgumentBuilder<ServerCommandSource, String> addOn(@Nullable ITabable[] tabs, RegisterableCommand registerableCommand) {
 		return loop(create((tabs==null || tabs.length<1 || tabs[0]==null) ? "Argument0" : tabs[0].getTabableName(), registerableCommand), 1, 8, tabs, registerableCommand);
 	}
 	

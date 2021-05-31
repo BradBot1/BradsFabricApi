@@ -3,7 +3,9 @@ package com.bb1.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -30,6 +32,14 @@ public class TextUtils {
 			list.add(new LiteralText(string));
 		}
 		return list;
+	}
+	
+	public static Set<Text> convert(Collection<String> text) {
+		Set<Text> set = new HashSet<Text>();
+		for (String s : text) {
+			set.add(new LiteralText(s));
+		}
+		return set;
 	}
 	
 }

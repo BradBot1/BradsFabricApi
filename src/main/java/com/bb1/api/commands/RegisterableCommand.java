@@ -44,7 +44,6 @@ public class RegisterableCommand {
 				ITabable t = c.getParams()[i];
 				if (t instanceof TabableSubCommand) {
 					TabableSubCommand ts = (TabableSubCommand) t;
-					for (String s : copyAfter(args, i)) System.err.println(s);
 					return ts.getSubCommand(args[i]).execute(commandSource, commandLabel, copyAfter(args, i));
 				} else {
 					continue;

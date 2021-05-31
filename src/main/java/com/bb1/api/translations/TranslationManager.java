@@ -1,7 +1,9 @@
 package com.bb1.api.translations;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
@@ -11,13 +13,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import fr.catcore.server.translations.api.ServerTranslations;
+import fr.catcore.server.translations.api.resource.language.ServerLanguageDefinition;
 import fr.catcore.server.translations.api.resource.language.TranslationMap;
+import fr.catcore.server.translations.api.resource.language.TranslationsReloadListener;
 
-public final class TranslationManager {
+public final class TranslationManager implements TranslationsReloadListener {
 	/**
 	 * The instance of {@link ServerTranslations} that we use to modify translations
 	 */
-	private static final ServerTranslations SERVER_TRANSLATIONS = ServerTranslations.INSTANCE;
+	public static final ServerTranslations SERVER_TRANSLATIONS = ServerTranslations.INSTANCE;
 	/**
 	 * An instance of {@link TranslationManager}
 	 */
@@ -31,13 +35,15 @@ public final class TranslationManager {
 	/**
 	 * The language to register translations to if no translations are known
 	 */
-	public static final String DEFAULT_LANG = "unkown";
+	public static final String DEFAULT_LANG = (SERVER_TRANSLATIONS.getDefaultLanguage().definition.getCode()==null) ? "unkown" : SERVER_TRANSLATIONS.getDefaultLanguage().definition.getCode();
 	/**
 	 * In the format regional -> translationKey -> value
 	 */
 	private final Map<String, TranslationMap> translations = new HashMap<>();
 	
-	private TranslationManager() {}
+	private TranslationManager() {
+		SERVER_TRANSLATIONS.registerReloadListener(this);
+	}
 	/**
 	 * Converts the translation list to json
 	 */
@@ -81,10 +87,34 @@ public final class TranslationManager {
 		translations.put(lang, translationMap);
 	}
 	
-	public void pushAllTranslations(boolean force) {
-		for (Entry<String, TranslationMap> entry : translations.entrySet()) {
-			SERVER_TRANSLATIONS.addTranslations(entry.getKey(), new Supplier<TranslationMap>() { @Override public TranslationMap get() { return entry.getValue(); } });
+	public Set<String> getLangs() {
+		Set<String> set = new HashSet<String>();
+		for (ServerLanguageDefinition s : SERVER_TRANSLATIONS.getAllLanguages()) {
+			set.add(s.getCode());
 		}
+		set.add(DEFAULT_LANG);
+		return set;
+	}
+	
+	public void pushAllTranslations(boolean force) {
+		for (String s : getLangs()) {
+			SERVER_TRANSLATIONS.addTranslations(s, new Supplier<TranslationMap>() { @Override public TranslationMap get() { return translations.getOrDefault(s, new TranslationMap()); }});
+		}
+	}
+	/**
+	 * Called when translations should be reloaded
+	 */
+	@Override
+	public void reload() {
+		pushAllTranslations(true);
+	}
+	
+	protected void load() {
+		
+	}
+	
+	protected void save() {
+		
 	}
 	
 }

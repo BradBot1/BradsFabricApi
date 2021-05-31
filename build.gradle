@@ -16,7 +16,7 @@ repositories {
 }
 
 minecraft {
-	accessWidener =  file("src/main/resources/${project.archives_base_name}.accesswidener")
+	accessWidener =  file("src/main/resources/BradsFabricApi.accesswidener")
 }
 
 dependencies {

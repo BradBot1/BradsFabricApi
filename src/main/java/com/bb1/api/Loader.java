@@ -9,7 +9,6 @@ import com.bb1.api.translations.DefaultTranslations;
 import com.bb1.api.translations.TranslationManager;
 import com.bb1.api.translations.command.TranslationCommand;
 
-import fr.catcore.server.translations.api.resource.language.TranslationsReloadListener;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
@@ -31,7 +30,7 @@ import net.minecraft.text.TranslatableText;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class Loader implements DedicatedServerModInitializer, TranslationsReloadListener {
+public class Loader implements DedicatedServerModInitializer {
 	/**
 	 * Formats a {@link TranslatableText} in the format "bradsfabricapi." + <i>key</i>;
 	 * 
@@ -76,6 +75,7 @@ public class Loader implements DedicatedServerModInitializer, TranslationsReload
 		// Load commands
 		registerCommands();
 		Events.LOAD_EVENT.onEvent(new LoadEvent());
+		Events.UNLOAD_EVENT.register((e)->CONFIG.save());
 	}
 	
 	protected void loadPermissions() {
@@ -88,12 +88,5 @@ public class Loader implements DedicatedServerModInitializer, TranslationsReload
 		if (CONFIG.loadTranslationCommand) new TranslationCommand().register();
 		if (CONFIG.loadPermissionCommand && CONFIG.loadPermissionModule) new PermissionCommand().register();
 	}
-	/**
-	 * Called when translations should be reloaded
-	 */
-	@Override
-	public void reload() {
-		TranslationManager.get().pushAllTranslations(true); // TODO: idfk
-	}
-
+	
 }

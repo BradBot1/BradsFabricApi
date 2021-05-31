@@ -19,7 +19,7 @@ public class MinecraftServerMixin {
 		Loader.setMinecraftServer((MinecraftServer) (Object) this);
 	}
 	
-	@Inject(method = "shutdownServer()V", at = @At("HEAD"))
+	@Inject(method = "shutdown()V", at = @At("HEAD"))
 	public void serverStopped(CallbackInfo callbackInfo) {
 		Events.UNLOAD_EVENT.onEvent(new UnloadEvent());
 	}
