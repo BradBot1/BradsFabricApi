@@ -51,7 +51,7 @@ public final class PermissionManager {
 	}
 	
 	public void registerEvent() {
-		if (Loader.config.loadPermissionModule) { // Only register if allowed to (the check is here aswell in-case another mod attempts to load it)
+		if (Loader.CONFIG.loadPermissionModule) { // Only register if allowed to (the check is here aswell in-case another mod attempts to load it)
 			PermissionCheckEvent.EVENT.register(new PermissionCheckEvent() {
 				
 				@Override

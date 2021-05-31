@@ -1,5 +1,7 @@
 package com.bb1.api;
 
+import com.bb1.api.events.Events;
+import com.bb1.api.events.Events.LoadEvent;
 import com.bb1.api.permissions.DefaultPermissions;
 import com.bb1.api.permissions.PermissionManager;
 import com.bb1.api.permissions.command.PermissionCommand;
@@ -63,27 +65,28 @@ public class Loader implements DedicatedServerModInitializer, TranslationsReload
 		return null;
 	}
 	
-	public static ApiConfig config = new ApiConfig();
+	public static final ApiConfig CONFIG = new ApiConfig();
 	
 	@Override
 	public void onInitializeServer() {
-		config.load();
+		CONFIG.load();
 		// Load translations
 		DefaultTranslations.register();
 		TranslationManager.get().pushAllTranslations(true);
 		// Load commands
 		registerCommands();
+		Events.LOAD_EVENT.onEvent(new LoadEvent());
 	}
 	
 	protected void loadPermissions() {
 		// Add all permissions to the set
 		DefaultPermissions.load();
-		if (config.loadPermissionModule) PermissionManager.get().registerEvent();
+		if (CONFIG.loadPermissionModule) PermissionManager.get().registerEvent();
 	}
 	
 	protected void registerCommands() {
-		if (config.loadTranslationCommand) new TranslationCommand().register();
-		if (config.loadPermissionCommand && config.loadPermissionModule) new PermissionCommand().register();
+		if (CONFIG.loadTranslationCommand) new TranslationCommand().register();
+		if (CONFIG.loadPermissionCommand && CONFIG.loadPermissionModule) new PermissionCommand().register();
 	}
 	/**
 	 * Called when translations should be reloaded

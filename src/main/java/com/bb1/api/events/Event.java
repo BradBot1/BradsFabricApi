@@ -23,21 +23,34 @@ public class Event<E> extends net.fabricmc.fabric.api.event.Event<EventHandler<E
 
 	private final Set<EventHandler<E>> listeners = new HashSet<EventHandler<E>>();
 
+	public Event() {
+		this.invoker = new EventInvoker();
+	}
+
 	@Override
 	public void register(EventHandler<E> listener) {
 		listeners.add(listener);
 	}
 	
 	public void onEvent(E event) {
-		for (EventHandler<E> listener : listeners) {
-			if (event instanceof CancellableEvent && ((CancellableEvent)event).isCancelled()) break; // Cancelled so no more handling
-			listener.onEvent(event);
-		}
+		invoker.onEvent(event);
 	}
 	/**
 	 * A simple interface to handle events
 	 */
 	@FunctionalInterface
 	public static interface EventHandler<E> { public void onEvent(E event); }
+	
+	protected class EventInvoker implements EventHandler<E> {
+
+		@Override
+		public void onEvent(E event) {
+			for (EventHandler<E> listener : listeners) {
+				if (event instanceof CancellableEvent && ((CancellableEvent)event).isCancelled()) break; // Cancelled so no more handling
+				listener.onEvent(event);
+			}
+		}
+		
+	}
 	
 }
