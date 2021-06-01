@@ -4,7 +4,8 @@
   "package": "com.bb1.api.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-  	"MinecraftServerMixin"
+  	"MinecraftServerMixin",
+  	"ChatMixin"
   ],
   "client": [],
   "injectors": {
