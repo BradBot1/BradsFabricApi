@@ -26,7 +26,7 @@ public final class TranslationCommand extends Command {
 	
 	@Override
 	public ITabable[] getParams() {
-		return new ITabable[] {new TabableSubCommand(new TranslationSetSubCommand(), new TranslationCheckSubCommand(), new TranslationUpdateSubCommand())};
+		return new ITabable[] {new TabableSubCommand(new TranslationSetSubCommand(), new TranslationCheckSubCommand(), new TranslationUpdateSubCommand(), new TranslationReloadSubCommand())};
 	}
 	
 }

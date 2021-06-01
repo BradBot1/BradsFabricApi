@@ -1,16 +1,27 @@
 package com.bb1.api.translations;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import org.jetbrains.annotations.NotNull;
 
+import com.bb1.api.Loader;
+import com.bb1.api.events.Events;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import fr.catcore.server.translations.api.ServerTranslations;
 import fr.catcore.server.translations.api.resource.language.ServerLanguageDefinition;
@@ -43,6 +54,8 @@ public final class TranslationManager implements TranslationsReloadListener {
 	
 	private TranslationManager() {
 		SERVER_TRANSLATIONS.registerReloadListener(this);
+		Events.LOAD_EVENT.register((event)->load());
+		Events.UNLOAD_EVENT.register((event)->save());
 	}
 	/**
 	 * Converts the translation list to json
@@ -106,15 +119,45 @@ public final class TranslationManager implements TranslationsReloadListener {
 	 */
 	@Override
 	public void reload() {
+		load();
 		pushAllTranslations(true);
+		save();
 	}
 	
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	private static final JsonParser PARSER = new JsonParser();
+	private static final String TRANSLATION_FILE = Loader.getRootPath()+File.separator+"config"+File.separator+"translations.json";
+	
 	protected void load() {
-		
+		try {
+			File file = new File(TRANSLATION_FILE);
+			if (!file.exists()) return; // Can't load nothing
+			ArrayList<String> r = new ArrayList<String>();
+			Scanner s = new Scanner(file);
+			while (s.hasNext()) {
+		    	r.add(s.nextLine());
+			}
+			s.close();
+			JsonElement contents = PARSER.parse(String.join("", r));
+			addFromJson(contents.getAsJsonObject());
+			pushAllTranslations(true);
+		} catch (IOException e) {
+			// TODO: log that we failed to load
+		}
 	}
 	
 	protected void save() {
-		
+		try {
+			File file = new File(TRANSLATION_FILE);
+			if (!file.exists()) file.createNewFile();
+			BufferedWriter b = new BufferedWriter(new PrintWriter(file));
+			b.write(GSON.toJson(convertLangToJson()));
+			b.flush();
+			b.close();
+			pushAllTranslations(true);
+		} catch (Throwable e) {
+			// TODO: log that we failed to save
+		}
 	}
 	
 }
