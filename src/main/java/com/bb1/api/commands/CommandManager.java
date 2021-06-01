@@ -44,7 +44,15 @@ public final class CommandManager {
 				dispatcher.register(lab);
 				if (command.getAliases()!=null && command.getAliases().size()>0) {
 					for (String s : command.getAliases()) {
-						dispatcher.register(LiteralArgumentBuilder.literal(s));
+						LiteralArgumentBuilder<ServerCommandSource> lab2 = LiteralArgumentBuilder.literal(s);
+						lab2.then(addOn(command.getParams(), registerableCommand));
+						lab2.executes(context -> {
+							final String given = context.getInput();
+							String[] split = given.split(" ");
+							if (!split[0].startsWith("/")) return 0;
+							final String commandName = split[0].replaceFirst("/", "");
+							return registerableCommand.execute(context.getSource(), commandName, given.replaceFirst("/"+commandName+" ", "").split(" "));
+						});
 					}
 				}
 			}

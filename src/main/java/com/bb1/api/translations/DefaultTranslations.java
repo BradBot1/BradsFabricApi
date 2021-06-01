@@ -8,6 +8,10 @@ import net.minecraft.text.TranslatableText;
 
 public final class DefaultTranslations {
 	
+	// TRANSLATIONS
+	
+	public static final TranslatableText TRANSLATIONS_UPDATED = Loader.getTranslatableText("translation.updated");
+	
 	// PERMISSIONS
 	
 	public static final TranslatableText PERMISSION_HAS = Loader.getTranslatableText("permission.has");

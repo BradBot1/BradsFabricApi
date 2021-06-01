@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bb1.api.Loader;
-import com.bb1.utils.TextUtils;
 
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -26,7 +25,7 @@ public class TabablePlayer implements ITabable {
 	
 	@Override
 	public List<Text> getTabable(ServerCommandSource commandSource, String[] params) {
-		return TextUtils.sortAlphabetically(TextUtils.copyPartialMatches(params[params.length-1], getPlayerNames()));
+		return getPlayerNames();
 	}
 
 	@Override

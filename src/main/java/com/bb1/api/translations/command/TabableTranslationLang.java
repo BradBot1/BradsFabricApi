@@ -1,13 +1,13 @@
 package com.bb1.api.translations.command;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.bb1.api.commands.tab.ITabable;
 import com.bb1.api.translations.TranslationManager;
-import com.bb1.utils.CollectionUtils;
-import com.bb1.utils.TextUtils;
 
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 public class TabableTranslationLang implements ITabable {
@@ -19,7 +19,11 @@ public class TabableTranslationLang implements ITabable {
 
 	@Override
 	public List<Text> getTabable(ServerCommandSource commandSource, String[] params) {
-		return CollectionUtils.convert(TextUtils.convert(TranslationManager.get().getLangs()));
+		List<Text> text = new ArrayList<Text>();
+		for (String s : TranslationManager.get().getLangs()) {
+			text.add(new LiteralText(s));
+		}
+		return text;
 	}
 
 }
