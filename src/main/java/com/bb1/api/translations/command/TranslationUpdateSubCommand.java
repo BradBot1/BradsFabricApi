@@ -18,7 +18,7 @@ public class TranslationUpdateSubCommand extends SubCommand {
 	@Override
 	public int execute(ServerCommandSource source, String alias, String[] params) {
 		TranslationManager.get().pushAllTranslations(true);
-		source.sendFeedback(DefaultTranslations.TRANSLATIONS_UPDATED, false);
+		source.sendFeedback(DefaultTranslations.TRANSLATIONS_UPDATED, true);
 		return 1;
 	}
 	
