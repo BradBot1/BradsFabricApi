@@ -44,7 +44,12 @@ public class RegisterableCommand {
 				ITabable t = c.getParams()[i];
 				if (t instanceof TabableSubCommand) {
 					TabableSubCommand ts = (TabableSubCommand) t;
-					return ts.getSubCommand(args[i]).execute(commandSource, commandLabel, copyAfter(args, i));
+					SubCommand sub = ts.getSubCommand(args[i]);
+					if (c.getPermission()!=null && !Permissions.check(commandSource, sub.getPermission())) {
+						commandSource.sendFeedback(DefaultTranslations.NEED_PERMISSIONS, false);
+						return 0;
+					}
+					return sub.execute(commandSource, commandLabel, copyAfter(args, i));
 				} else {
 					continue;
 				}
@@ -63,6 +68,9 @@ public class RegisterableCommand {
 	}
 	
 	public List<Text> tabComplete(ServerCommandSource commandSource, String alias, String[] args) {
+		if (c.getPermission()!=null && !Permissions.check(commandSource, c.getPermission())) {
+			return new ArrayList<Text>(); // Just default to showing the '?' error
+		}
 		if (c.getParams()==null || c.getParams().length==0) {
 			return new ArrayList<Text>();
 		} else {
