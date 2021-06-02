@@ -100,6 +100,12 @@ public final class TranslationManager implements TranslationsReloadListener {
 		translations.put(lang, translationMap);
 	}
 	
+	public void setIfNotPresent(String translation_key, String lang, String value) {
+		TranslationMap translationMap = translations.getOrDefault(lang, new TranslationMap());
+		if (!translationMap.contains(translation_key)) translationMap.put(translation_key, value);
+		translations.put(lang, translationMap);
+	}
+	
 	public Set<String> getLangs() {
 		Set<String> set = new HashSet<String>();
 		for (ServerLanguageDefinition s : SERVER_TRANSLATIONS.getAllLanguages()) {
