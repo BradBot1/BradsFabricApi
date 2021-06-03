@@ -23,7 +23,7 @@ import net.minecraft.text.Text;
 public final class Events {
 	/** Called after the API loads fully */
 	public static final Event<LoadEvent> LOAD_EVENT = new Event<LoadEvent>();
-	/** Called when the API starts to unload */
+	/** Called when minecraft beings to stop */
 	public static final Event<UnloadEvent> UNLOAD_EVENT = new Event<UnloadEvent>();
 	/** Called when a message is sent to a client<br><i>(cancelling only stops the message being sent to the client as this event is called after the message has already been handled by the server)</i>*/
 	public static final Event<ChatEvent> MESSAGE_EVENT = new Event<ChatEvent>();
@@ -31,11 +31,13 @@ public final class Events {
 	public static final Event<ConfigChangeEvent> CONFIG_EVENT = new Event<ConfigChangeEvent>();
 	/** Called when mc autosaves */
 	public static final Event<AutoSaveEvent> AUTOSAVE_EVENT = new Event<AutoSaveEvent>();
+	/** Called when minecraft preforms a reload */
+	public static final Event<ReloadEvent> RELOAD_EVENT = new Event<ReloadEvent>();
 
 	private Events() { }
 	
 	public static class LoadEvent {
-		/** May be null if disabled in {@link ApiConfig} */
+		
 		@Nullable
 		public MinecraftServer getMinecraftServer() { return Loader.getMinecraftServer(); }
 		
@@ -57,7 +59,7 @@ public final class Events {
 	}
 	
 	public static class UnloadEvent {
-		/** May be null if disabled in {@link ApiConfig} */
+		
 		@Nullable
 		public MinecraftServer getMinecraftServer() { return Loader.getMinecraftServer(); }
 		
@@ -138,5 +140,21 @@ public final class Events {
 	}
 	
 	public static class AutoSaveEvent { }
+	
+	public static class ReloadEvent {
+		
+		@Nullable
+		public MinecraftServer getMinecraftServer() { return Loader.getMinecraftServer(); }
+		
+		@NotNull
+		public TranslationManager getTranslationManager() { return TranslationManager.get(); }
+		/** May be null if disabled in {@link ApiConfig} */
+		@Nullable
+		public PermissionManager getPermissionManager() { return getConfig().loadPermissionModule ? PermissionManager.get() : null; }
+		
+		@NotNull
+		public ApiConfig getConfig() { return Loader.CONFIG; }
+		
+	}
 	
 }
