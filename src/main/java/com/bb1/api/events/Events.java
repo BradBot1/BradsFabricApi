@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import com.bb1.api.ApiConfig;
 import com.bb1.api.Loader;
 import com.bb1.api.commands.CommandManager;
+import com.bb1.api.config.Config;
 import com.bb1.api.permissions.PermissionManager;
 import com.bb1.api.translations.TranslationManager;
 
@@ -25,6 +26,10 @@ public final class Events {
 	public static final Event<UnloadEvent> UNLOAD_EVENT = new Event<UnloadEvent>();
 	/** Called when a message is sent to a client<br><i>(cancelling only stops the message being sent to the client as this event is called after the message has already been handled by the server)</i>*/
 	public static final Event<ChatEvent> MESSAGE_EVENT = new Event<ChatEvent>();
+	/** Called when a config saves, loads or needs to have its instances refreshed<br><i>(this is automatically handled by the config unless disabled)</i> */
+	public static final Event<ConfigChangeEvent> CONFIG_EVENT = new Event<ConfigChangeEvent>();
+	/** Called when mc autosaves */
+	public static final Event<AutoSaveEvent> AUTOSAVE_EVENT = new Event<AutoSaveEvent>();
 
 	private Events() { }
 	
@@ -84,5 +89,36 @@ public final class Events {
 		public void cancel() { this.cancel = true; }
 		
 	}
+	
+	public static class ConfigChangeEvent {
+		
+		@NotNull private final String configName;
+		@NotNull private ConfigChangeType type;
+		
+		public ConfigChangeEvent(@NotNull Config config) { this(config, null); }
+		
+		public ConfigChangeEvent(@NotNull Config config, @Nullable ConfigChangeType type) { this(config.getConfigName(), type); }
+		
+		public ConfigChangeEvent(@NotNull String config, @Nullable ConfigChangeType type) { this.configName = config; this.type = (type==null) ? ConfigChangeType.REFRESH : type; };
+		
+		@NotNull
+		public String getConfig() { return this.configName; }
+		/** Defaults to {@link ConfigChangeType#REFRESH} if null */
+		@NotNull
+		public ConfigChangeType getType() { return this.type; }
+		
+		public static enum ConfigChangeType {
+			/** When the config saves to a file */
+			SAVE,
+			/** When the config is loaded from a file */
+			LOAD,
+			/** Called to tell all instances of the config to load<i>(update)</i> */
+			REFRESH,
+			;
+		}
+		
+	}
+	
+	public static class AutoSaveEvent { }
 	
 }

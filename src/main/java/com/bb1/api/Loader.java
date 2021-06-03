@@ -1,5 +1,6 @@
 package com.bb1.api;
 
+import com.bb1.api.config.command.ConfigCommand;
 import com.bb1.api.events.Events;
 import com.bb1.api.events.Events.LoadEvent;
 import com.bb1.api.permissions.DefaultPermissions;
@@ -87,6 +88,7 @@ public class Loader implements DedicatedServerModInitializer {
 	protected void registerCommands() {
 		if (CONFIG.loadTranslationCommand) new TranslationCommand().register();
 		if (CONFIG.loadPermissionCommand && CONFIG.loadPermissionModule) new PermissionCommand().register();
+		if (CONFIG.loadConfigCommand) new ConfigCommand().register();
 	}
 	
 }

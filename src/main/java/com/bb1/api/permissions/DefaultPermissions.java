@@ -6,6 +6,9 @@ import java.util.Set;
 
 public final class DefaultPermissions {
 	
+	public static final String CONFIG_VIEW = "bradsfabricapi.config.get";
+	public static final String CONFIG_MODIFY = "bradsfabricapi.config.set";
+	
 	public static final String PERMISSIONS_VIEW = "bradsfabricapi.permissions.get";
 	public static final String PERMISSIONS_MODIFY = "bradsfabricapi.permissions.set";
 	

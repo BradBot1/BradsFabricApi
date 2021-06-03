@@ -14,18 +14,14 @@ public class TabablePlayer implements ITabable {
 	public TabablePlayer() {
 		
 	}
-	
-	public List<Text> getPlayerNames() {
+
+	@Override
+	public List<Text> getTabable(ServerCommandSource commandSource, String[] params) {
 		List<Text> list = new ArrayList<>();
 		for (ServerPlayerEntity serverPlayerEntity : Loader.getMinecraftServer().getPlayerManager().getPlayerList()) {
 			list.add(serverPlayerEntity.getDisplayName());
 		}
 		return list;
-	}
-	
-	@Override
-	public List<Text> getTabable(ServerCommandSource commandSource, String[] params) {
-		return getPlayerNames();
 	}
 
 	@Override

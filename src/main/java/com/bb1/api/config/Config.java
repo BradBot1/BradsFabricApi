@@ -11,6 +11,9 @@ import java.util.Scanner;
 import org.jetbrains.annotations.NotNull;
 
 import com.bb1.api.Loader;
+import com.bb1.api.events.Events;
+import com.bb1.api.events.Events.ConfigChangeEvent;
+import com.bb1.api.events.Events.ConfigChangeEvent.ConfigChangeType;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -28,23 +31,51 @@ public abstract class Config {
 	
 	protected static final JsonParser PARSER = new JsonParser();
 	
-	protected static final String ConfigDirPath = Loader.getRootPath()+File.separator+"config"+File.separator;
-	
+	public static final String CONFIG_DIRECTORY = Loader.getRootPath()+File.separator+"config"+File.separator;
+	/** Names cannot contain extensions, for example exampleConfig.yml is not a valid config name */
 	@NotNull private final String name;
 	
 	protected Config(String name) {
 		this.name = name;
+		if (throwAndHandleEvents()) { // We should handle events
+			Events.CONFIG_EVENT.register((event) -> {
+				if (!event.getConfig().equalsIgnoreCase(getConfigName()) || !event.getType().equals(ConfigChangeType.REFRESH)) return;
+				load();
+			});
+			Events.AUTOSAVE_EVENT.register((event) -> {
+				save();
+			});
+			Events.LOAD_EVENT.register((event) -> {
+				load();
+			});
+			Events.UNLOAD_EVENT.register((event) -> {
+				save();
+			});
+		}
 	}
-	
 	/**
 	 * This defines what the config should be saved as
 	 */
 	@NotNull
-	public final String getConfigName() { return this.name; }
+	public final String getConfigName() { return this.name.replaceAll("[\\.]\\w+", ""); }
+	/**
+	 * If the config should through {@link ConfigChangeEvent}'s
+	 * 
+	 * @apiNote will make it auto save on certain events
+	 */
+	public boolean throwAndHandleEvents() { return true; }
+	/**
+	 * Tells all config instances <i>(of this config)</i> to refresh
+	 * 
+	 * @apiNote Simply calls the refresh event
+	 */
+	public void refresh() {
+		if (throwAndHandleEvents()) Events.CONFIG_EVENT.onEvent(new ConfigChangeEvent(this, ConfigChangeType.REFRESH));
+	}
 	
 	public void load() {
-		new File(ConfigDirPath).mkdirs();
-		File file = new File(ConfigDirPath+getConfigName()+".json");
+		new File(CONFIG_DIRECTORY).mkdirs();
+		File file = new File(CONFIG_DIRECTORY+getConfigName()+".json");
 		if (!file.exists()) return; // Can't load anything if there is file
 		ArrayList<String> r = new ArrayList<>();
 		try {
@@ -103,6 +134,7 @@ public abstract class Config {
 							field.set(this, jsonPrimitive.getAsCharacter());
 						}
 					}
+					if (throwAndHandleEvents()) Events.CONFIG_EVENT.onEvent(new ConfigChangeEvent(this, ConfigChangeType.LOAD));
 				} catch (Exception e) {}
 			}
 		}
@@ -145,14 +177,15 @@ public abstract class Config {
 		}
 		try {
 			// First create the config directory
-			new File(ConfigDirPath).mkdirs();
-			File file = new File(ConfigDirPath+getConfigName()+".json");
+			new File(CONFIG_DIRECTORY).mkdirs();
+			File file = new File(CONFIG_DIRECTORY+getConfigName()+".json");
 			if (!file.exists()) file.createNewFile(); // Create file if it doesn't already exist
 			file.createNewFile();
 			BufferedWriter b = new BufferedWriter(new PrintWriter(file));
 			b.write(GSON.toJson(jsonObject));
 			b.flush();
 			b.close();
+			if (throwAndHandleEvents()) Events.CONFIG_EVENT.onEvent(new ConfigChangeEvent(this, ConfigChangeType.SAVE));
 		} catch (IOException e) {
 			// TODO: log error
 		}

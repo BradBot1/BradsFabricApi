@@ -29,4 +29,8 @@ public class ApiConfig extends Config {
 	 * If {@link #loadPermissionModule} is off this auto disables
 	 */
 	@Storable public boolean loadPermissionCommand = loadPermissionModule;
+	/**
+	 * If you do not wish for configs to be modifyable via a command you can disable this
+	 */
+	@Storable public boolean loadConfigCommand = true;
 }
