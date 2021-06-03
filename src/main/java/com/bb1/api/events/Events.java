@@ -9,6 +9,7 @@ import com.bb1.api.ApiConfig;
 import com.bb1.api.Loader;
 import com.bb1.api.commands.CommandManager;
 import com.bb1.api.config.Config;
+import com.bb1.api.datapacks.DatapackManager;
 import com.bb1.api.permissions.PermissionManager;
 import com.bb1.api.translations.TranslationManager;
 
@@ -50,11 +51,28 @@ public final class Events {
 		@NotNull
 		public ApiConfig getConfig() { return Loader.CONFIG; }
 		
+		@NotNull
+		public DatapackManager getDatapackManager() { return DatapackManager.get(); }
+		
 	}
-	/**
-	 * Same as the load event but with a different name
-	 */
-	public static class UnloadEvent extends LoadEvent { }
+	
+	public static class UnloadEvent {
+		/** May be null if disabled in {@link ApiConfig} */
+		@Nullable
+		public MinecraftServer getMinecraftServer() { return Loader.getMinecraftServer(); }
+		
+		@NotNull
+		public CommandManager getCommandManager() { return CommandManager.get(); }
+		
+		@NotNull
+		public TranslationManager getTranslationManager() { return TranslationManager.get(); }
+		/** May be null if disabled in {@link ApiConfig} */
+		@Nullable
+		public PermissionManager getPermissionManager() { return getConfig().loadPermissionModule ? PermissionManager.get() : null; }
+		
+		@NotNull
+		public ApiConfig getConfig() { return Loader.CONFIG; }
+	}
 	
 	public static class ChatEvent implements CancellableEvent {
 		
