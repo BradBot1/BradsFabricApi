@@ -33,6 +33,8 @@ public final class Events {
 	public static final Event<AutoSaveEvent> AUTOSAVE_EVENT = new Event<AutoSaveEvent>();
 	/** Called when minecraft preforms a reload */
 	public static final Event<ReloadEvent> RELOAD_EVENT = new Event<ReloadEvent>();
+	
+	public static final Event<TickEvent> TICK_EVENT = new Event<TickEvent>();
 
 	private Events() { }
 	
@@ -156,5 +158,7 @@ public final class Events {
 		public ApiConfig getConfig() { return Loader.CONFIG; }
 		
 	}
+	
+	public static class TickEvent { }
 	
 }

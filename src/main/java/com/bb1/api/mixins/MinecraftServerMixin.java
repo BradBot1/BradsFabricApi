@@ -1,5 +1,7 @@
 package com.bb1.api.mixins;
 
+import java.util.function.BooleanSupplier;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -9,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.bb1.api.Loader;
 import com.bb1.api.events.Events;
 import com.bb1.api.events.Events.AutoSaveEvent;
+import com.bb1.api.events.Events.TickEvent;
 import com.bb1.api.events.Events.UnloadEvent;
 
 import net.minecraft.server.MinecraftServer;
@@ -33,4 +36,9 @@ public class MinecraftServerMixin {
 		}
 	}
 	
+	@Inject(method = "tick(Ljava/util/function/BooleanSupplier;)V", at = @At("HEAD"))
+	public void onTick(BooleanSupplier shouldKeepTicking, CallbackInfo callbackInfo) {
+		Events.TICK_EVENT.onEvent(new TickEvent());
+	}
+
 }
