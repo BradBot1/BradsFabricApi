@@ -150,6 +150,7 @@ public abstract class Config {
 				if (jsonObject.has(saveUnder)) throw new IllegalArgumentException("The field "+field.getName()+"("+saveUnder+") in the config "+getClass().getName()+"("+getConfigName()+".json) is trying to save under a key already used!");
 				Object value;
 				try {
+					@SuppressWarnings("deprecation")
 					boolean b = field.isAccessible();
 					field.setAccessible(true);
 					value = field.get(this);

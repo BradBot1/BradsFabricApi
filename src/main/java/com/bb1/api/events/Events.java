@@ -87,15 +87,15 @@ public final class Events {
 		public ChatEvent(@NotNull GameMessageS2CPacket packet, @Nullable ServerPlayerEntity reciever) { this.packet = packet; this.reciever = reciever; }
 		
 		@Nullable
-		public UUID getSender() { return this.packet.senderUuid; }
+		public UUID getSender() { return this.packet.getSender(); }
 		
 		@NotNull
-		public MutableText getMessage() { return this.packet.message.shallowCopy(); }
+		public MutableText getMessage() { return this.packet.getMessage().shallowCopy(); }
 		
 		public void setMessage(@NotNull Text text) { this.packet.message = text; }
 		
 		@NotNull
-		public MessageType getMessageType() { return this.packet.location; }
+		public MessageType getMessageType() { return this.packet.getLocation(); }
 		
 		public void setMessageType(@NotNull MessageType messageType) { this.packet.location = messageType; }
 		/** Returns the player the message is being sent to, may be null */

@@ -46,7 +46,7 @@ public final class TranslationManager implements TranslationsReloadListener {
 	/**
 	 * The language to register translations to if no translations are known
 	 */
-	public static final String DEFAULT_LANG = (SERVER_TRANSLATIONS.getDefaultLanguage().definition.getCode()==null) ? "unkown" : SERVER_TRANSLATIONS.getDefaultLanguage().definition.getCode();
+	public static final String DEFAULT_LANG = (SERVER_TRANSLATIONS.getDefaultLanguage().definition().code()==null) ? "unkown" : SERVER_TRANSLATIONS.getDefaultLanguage().definition().code();
 	/**
 	 * In the format regional -> translationKey -> value
 	 */
@@ -109,7 +109,7 @@ public final class TranslationManager implements TranslationsReloadListener {
 	public Set<String> getLangs() {
 		Set<String> set = new HashSet<String>();
 		for (ServerLanguageDefinition s : SERVER_TRANSLATIONS.getAllLanguages()) {
-			set.add(s.getCode());
+			set.add(s.code());
 		}
 		set.add(DEFAULT_LANG);
 		return set;

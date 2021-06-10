@@ -12,11 +12,11 @@ import com.bb1.api.events.Events;
 import com.bb1.api.events.Events.ReloadEvent;
 
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceReloadListener;
+import net.minecraft.resource.ResourceReloader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 
-public final class DatapackManager implements ResourceReloadListener {
+public final class DatapackManager implements ResourceReloader {
 
 	private static final DatapackManager INSTANCE = new DatapackManager();
 
