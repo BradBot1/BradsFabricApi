@@ -8,7 +8,9 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.bb1.api.Loader;
 import com.bb1.api.commands.tab.ITabable;
+import com.bb1.api.providers.CommandProvider;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -33,7 +35,7 @@ import net.minecraft.text.Text;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public final class CommandManager {
+public final class CommandManager implements CommandProvider {
 	
 	private static final CommandManager COMMAND_MANAGER = new CommandManager();
 	
@@ -44,6 +46,7 @@ public final class CommandManager {
 	private Set<RegisterableCommand> commands = new HashSet<RegisterableCommand>();
 	
 	private CommandManager() {
+		if (!Loader.CONFIG.loadCommandModule) return;
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
 			for (RegisterableCommand registerableCommand : commands) {
 				final Command command = registerableCommand.getInner();
@@ -152,5 +155,8 @@ public final class CommandManager {
 		}
 		return null;
 	}
+
+	@Override
+	public @NotNull String getProviderName() { return "CommandManager"; }
 	
 }

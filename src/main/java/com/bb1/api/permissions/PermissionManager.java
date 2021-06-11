@@ -8,61 +8,49 @@ import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.bb1.api.Loader;
+import com.bb1.api.providers.PermissionProvider;
 
-import me.lucko.fabric.api.permissions.v0.PermissionCheckEvent;
-import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.command.CommandSource;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 
-public final class PermissionManager {
+public final class PermissionManager implements PermissionProvider {
 	
 	private static final PermissionManager INSTANCE = new PermissionManager();
 	
 	public static PermissionManager get() { return INSTANCE; }
 	
-	private PermissionManager() { registerEvent(); }
+	private PermissionManager() { }
 	
-	private Map<UUID, Set<String>> permissionMap = new HashMap<UUID, Set<String>>();
+	private final Map<UUID, Set<String>> permissionMap = new HashMap<UUID, Set<String>>();
 	
-	public Set<String> getPermissions(UUID player) { return permissionMap.getOrDefault(player, new HashSet<String>()); }
+	private final Set<String> permissions = new HashSet<String>();
 	
-	public void givePermission(UUID player, String perm) {
+	public Set<String> getPermissions(PlayerEntity player) { return permissionMap.getOrDefault(player.getUuid(), new HashSet<String>()); }
+	
+	@Override
+	public void registerPermission(String permission) { this.permissions.add(permission); }
+	
+	@Override
+	public Set<String> getPermissions() { return this.permissions; }
+	
+	public void givePermission(PlayerEntity player, String perm) {
 		Set<String> set = permissionMap.getOrDefault(perm, new HashSet<String>());
 		set.add(perm);
-		permissionMap.put(player, set);
+		permissionMap.put(player.getUuid(), set);
 	}
 	
-	public void takePermission(UUID player, String perm) {
+	public void takePermission(PlayerEntity player, String perm) {
 		Set<String> set = permissionMap.getOrDefault(perm, new HashSet<String>());
 		set.remove(perm);
-		permissionMap.put(player, set);
+		permissionMap.put(player.getUuid(), set);
 	}
 	
-	public void togglePermission(UUID player, String perm) {
-		Set<String> set = permissionMap.getOrDefault(perm, new HashSet<String>());
-		if (set.contains(perm)) set.remove(perm); else set.add(perm);
-		permissionMap.put(player, set);
+	public boolean hasPermission(PlayerEntity player, String perm) {
+		return permissionMap.getOrDefault(player.getUuid(), new HashSet<String>()).contains(perm);
 	}
 	
-	public boolean hasPermission(UUID player, String perm) {
-		return permissionMap.getOrDefault(player, new HashSet<String>()).contains(perm);
-	}
-	
-	public void registerEvent() {
-		if (Loader.CONFIG.loadPermissionModule) { // Only register if allowed to (the check is here aswell in-case another mod attempts to load it)
-			PermissionCheckEvent.EVENT.register(new PermissionCheckEvent() {
-				
-				@Override
-				public @NotNull TriState onPermissionCheck(@NotNull CommandSource source, @NotNull String permission) {
-					if (source instanceof ServerCommandSource) return TriState.DEFAULT;
-					ServerPlayerEntity player = Loader.getServerPlayerEntity((ServerCommandSource)source);
-					return (player==null) ? TriState.DEFAULT : (hasPermission(player.getUuid(), permission) ? TriState.TRUE : TriState.DEFAULT);
-				}
-				
-			});
-		}
+	@Override
+	public @NotNull String getProviderName() {
+		return "PermissionManager";
 	}
 	
 }

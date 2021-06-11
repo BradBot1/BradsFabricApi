@@ -8,15 +8,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import org.jetbrains.annotations.NotNull;
 
 import com.bb1.api.Loader;
-import com.bb1.api.events.Events;
+import com.bb1.api.providers.TranslationProvider;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -43,7 +43,7 @@ import fr.catcore.server.translations.api.resource.language.TranslationsReloadLi
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public final class TranslationManager implements TranslationsReloadListener {
+public final class TranslationManager implements TranslationsReloadListener, TranslationProvider {
 	/**
 	 * The instance of {@link ServerTranslations} that we use to modify translations
 	 */
@@ -69,8 +69,6 @@ public final class TranslationManager implements TranslationsReloadListener {
 	
 	private TranslationManager() {
 		SERVER_TRANSLATIONS.registerReloadListener(this);
-		Events.LOAD_EVENT.register((event)->load());
-		Events.UNLOAD_EVENT.register((event)->save());
 	}
 	/**
 	 * Converts the translation list to json
@@ -129,19 +127,13 @@ public final class TranslationManager implements TranslationsReloadListener {
 		set.add(DEFAULT_LANG);
 		return set;
 	}
-	
-	public void pushAllTranslations(boolean force) {
-		for (String s : getLangs()) {
-			SERVER_TRANSLATIONS.addTranslations(s, new Supplier<TranslationMap>() { @Override public TranslationMap get() { return translations.getOrDefault(s, new TranslationMap()); }});
-		}
-	}
 	/**
 	 * Called when translations should be reloaded
 	 */
 	@Override
 	public void reload() {
 		load();
-		pushAllTranslations(true);
+		pushTranslations();
 		save();
 	}
 	
@@ -149,7 +141,10 @@ public final class TranslationManager implements TranslationsReloadListener {
 	private static final JsonParser PARSER = new JsonParser();
 	private static final String TRANSLATION_FILE = Loader.getRootPath()+File.separator+"config"+File.separator+"translations.json";
 	
-	protected void load() {
+	// TranslationProvider stuff
+	
+	@Override
+	public void load() {
 		try {
 			File file = new File(TRANSLATION_FILE);
 			if (!file.exists()) return; // Can't load nothing
@@ -161,13 +156,14 @@ public final class TranslationManager implements TranslationsReloadListener {
 			s.close();
 			JsonElement contents = PARSER.parse(String.join("", r));
 			addFromJson(contents.getAsJsonObject());
-			pushAllTranslations(true);
+			pushTranslations();
 		} catch (IOException e) {
 			// TODO: log that we failed to load
 		}
 	}
 	
-	protected void save() {
+	@Override
+	public void save() {
 		try {
 			File file = new File(TRANSLATION_FILE);
 			if (!file.exists()) file.createNewFile();
@@ -175,9 +171,28 @@ public final class TranslationManager implements TranslationsReloadListener {
 			b.write(GSON.toJson(convertLangToJson()));
 			b.flush();
 			b.close();
-			pushAllTranslations(true);
+			pushTranslations();
 		} catch (Throwable e) {
 			// TODO: log that we failed to save
+		}
+	}
+	
+	@Override
+	public String getProviderName() { return "TranslationManager"; }
+	
+	@Override
+	public void registerTranslation(String translation_key, String defaultValue) { setIfNotPresent(translation_key, DEFAULT_LANG, (defaultValue==null) ? translation_key : defaultValue); }
+	
+	@Override
+	public void setTranslation(String translation_key, String lang, String value) { setTranslation(translation_key, lang, value); }
+	
+	@Override
+	public String getTranslation(String translation_key, String lang) { return translate(translation_key, lang); }
+	
+	@Override
+	public void pushTranslations() {
+		for (String s : getLangs()) {
+			SERVER_TRANSLATIONS.addTranslations(s, new Supplier<TranslationMap>() { @Override public TranslationMap get() { return translations.getOrDefault(s, new TranslationMap()); }});
 		}
 	}
 	

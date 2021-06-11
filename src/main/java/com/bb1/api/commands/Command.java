@@ -5,6 +5,8 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
 import com.bb1.api.commands.tab.ITabable;
+import com.bb1.api.events.Events;
+import com.bb1.api.providers.CommandProvider;
 
 /**
  * Copyright 2021 BradBot_1
@@ -56,7 +58,11 @@ public abstract class Command implements CommandHandler {
 	// REGISTERING STUFF
 	
 	public void register() {
-		CommandManager.get().registerCommand(this);
+		Events.PROVIDER_REGISTRATION_EVENT.register((event)->{
+			if(event.getProvider() instanceof CommandProvider) {
+				((CommandProvider)event.getProvider()).registerCommand(this);
+			}
+		});
 	}
 	
 }

@@ -11,6 +11,7 @@ import com.bb1.api.commands.CommandManager;
 import com.bb1.api.config.Config;
 import com.bb1.api.datapacks.DatapackManager;
 import com.bb1.api.permissions.PermissionManager;
+import com.bb1.api.providers.Provider;
 import com.bb1.api.translations.TranslationManager;
 
 import net.minecraft.network.MessageType;
@@ -50,6 +51,8 @@ public final class Events {
 	public static final Event<ReloadEvent> RELOAD_EVENT = new Event<ReloadEvent>();
 	
 	public static final Event<TickEvent> TICK_EVENT = new Event<TickEvent>();
+	
+	public static final Event<ProviderRegistrationEvent> PROVIDER_REGISTRATION_EVENT = new Event<ProviderRegistrationEvent>();
 
 	private Events() { }
 	
@@ -175,5 +178,15 @@ public final class Events {
 	}
 	
 	public static class TickEvent { }
+	
+	public static class ProviderRegistrationEvent {
+		
+		private final Provider provider;
+		
+		public ProviderRegistrationEvent(@NotNull Provider provider) { this.provider = provider; }
+		
+		public Provider getProvider() { return this.provider; }
+		
+	}
 	
 }

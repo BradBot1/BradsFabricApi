@@ -1,1 +1,0 @@
-package com.bb1.api.permissions.command;

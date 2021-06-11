@@ -33,6 +33,14 @@ public class ApiConfig extends Config {
 	 * If the server has a permission manager then the default one can be disabled
 	 */
 	@Storable public boolean loadPermissionModule = true;
+	/**
+	 * If the server has another translation provider then this can be disabled
+	 */
+	@Storable public boolean loadTranslationModule = true;
+	/**
+	 * If the server has their own way to register commands they can disable the default one
+	 */
+	@Storable public boolean loadCommandModule = true;
 	
 	// Toggling commands
 	
@@ -40,10 +48,6 @@ public class ApiConfig extends Config {
 	 * I am not sure why you would want to disable this, but if they want to they can
 	 */
 	@Storable public boolean loadTranslationCommand = true;
-	/**
-	 * If {@link #loadPermissionModule} is off this auto disables
-	 */
-	@Storable public boolean loadPermissionCommand = loadPermissionModule;
 	/**
 	 * If you do not wish for configs to be modifyable via a command you can disable this
 	 */

@@ -2,11 +2,12 @@ package com.bb1.api.translations.command;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.bb1.api.Loader;
 import com.bb1.api.commands.SubCommand;
 import com.bb1.api.commands.tab.ITabable;
 import com.bb1.api.permissions.DefaultPermissions;
+import com.bb1.api.providers.TranslationProvider;
 import com.bb1.api.translations.DefaultTranslations;
-import com.bb1.api.translations.TranslationManager;
 
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
@@ -38,7 +39,12 @@ public class TranslationCheckSubCommand extends SubCommand {
 			source.sendFeedback(DefaultTranslations.NEED_ARGUMENTS, false);
 			return 0;
 		}
-		source.sendFeedback(new LiteralText(TranslationManager.get().translate(params[0], params[1])), false);
+		TranslationProvider translationProvider = Loader.getProvider(TranslationProvider.class);
+		if (translationProvider==null) {
+			source.sendFeedback(DefaultTranslations.PROVIDER_NOT_FOUND, false);
+			return 0;
+		}
+		source.sendFeedback(new LiteralText(translationProvider.getTranslation(params[0], params[1])), false);
 		return 1;
 	}
 	

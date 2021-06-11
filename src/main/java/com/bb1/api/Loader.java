@@ -1,16 +1,31 @@
 package com.bb1.api;
 
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import com.bb1.api.commands.CommandManager;
 import com.bb1.api.config.command.ConfigCommand;
 import com.bb1.api.events.Events;
 import com.bb1.api.events.Events.LoadEvent;
+import com.bb1.api.events.Events.ProviderRegistrationEvent;
 import com.bb1.api.permissions.DefaultPermissions;
 import com.bb1.api.permissions.PermissionManager;
-import com.bb1.api.permissions.command.PermissionCommand;
+import com.bb1.api.providers.PermissionProvider;
+import com.bb1.api.providers.Provider;
+import com.bb1.api.providers.TranslationProvider;
 import com.bb1.api.translations.DefaultTranslations;
 import com.bb1.api.translations.TranslationManager;
 import com.bb1.api.translations.command.TranslationCommand;
 
+import me.lucko.fabric.api.permissions.v0.PermissionCheckEvent;
 import net.fabricmc.api.DedicatedServerModInitializer;
+import net.fabricmc.fabric.api.util.TriState;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -50,6 +65,25 @@ public class Loader implements DedicatedServerModInitializer {
 	public static MinecraftServer getMinecraftServer() {
 		return minecraftServer;
 	}
+	
+	private static final Set<Provider> PROVIDERS = new HashSet<Provider>();
+	
+	public static void registerProvider(@NotNull Provider provider) {
+		if (PROVIDERS.contains(provider)) return;
+		PROVIDERS.add(provider);
+		Events.PROVIDER_REGISTRATION_EVENT.onEvent(new ProviderRegistrationEvent(provider));
+	}
+	
+	@Nullable
+	public static <T extends Provider> T getProvider(@NotNull Class<T> providerClass) {
+		for (Provider provider : PROVIDERS) {
+			try {
+				T t = providerClass.cast(provider);
+				if (t!=null) return t;
+			} catch (Throwable e) { }
+		}
+		return null;
+	}
 	/**
 	 * Returns the servers root directory
 	 */
@@ -66,29 +100,80 @@ public class Loader implements DedicatedServerModInitializer {
 	}
 	
 	public static final ApiConfig CONFIG = new ApiConfig();
+	private final FabricLoader loader = FabricLoader.getInstance();
 	
 	@Override
 	public void onInitializeServer() {
 		CONFIG.load();
 		// Load translations
-		DefaultTranslations.register();
-		TranslationManager.get().pushAllTranslations(true);
+		loadTranslations();
 		// Load commands
-		registerCommands();
+		loadCommands();
 		Events.LOAD_EVENT.onEvent(new LoadEvent());
 		Events.UNLOAD_EVENT.register((e)->CONFIG.save());
 	}
 	
-	protected void loadPermissions() {
-		// Add all permissions to the set
-		DefaultPermissions.load();
-		if (CONFIG.loadPermissionModule) PermissionManager.get().registerEvent();
+	protected void loadProviders() {
+		// Load events that effect providers
+		Events.LOAD_EVENT.register((event)->{
+			for (Provider provider : PROVIDERS) {
+				provider.load();
+			}
+		});
+		Events.UNLOAD_EVENT.register((event)->{
+			for (Provider provider : PROVIDERS) {
+				provider.save();
+			}
+		});
 	}
 	
-	protected void registerCommands() {
-		if (CONFIG.loadTranslationCommand) new TranslationCommand().register();
-		if (CONFIG.loadPermissionCommand && CONFIG.loadPermissionModule) new PermissionCommand().register();
-		if (CONFIG.loadConfigCommand) new ConfigCommand().register();
+	protected void loadTranslations() {
+		Events.PROVIDER_REGISTRATION_EVENT.register((event)->{
+			if (event.getProvider() instanceof TranslationProvider) {
+				TranslationProvider provider = (TranslationProvider) event.getProvider();
+				for (Field field : DefaultTranslations.class.getDeclaredFields()) {
+					try {
+						TranslatableText text = (TranslatableText) field.get(null);
+						provider.registerTranslation(text.getKey(), null);
+					} catch (Throwable e) {}
+				}
+			}
+		});
+		if (loader.isModLoaded("server_translations") && CONFIG.loadTranslationModule) { registerProvider(TranslationManager.get()); }
+		if (CONFIG.loadTranslationCommand) { new ConfigCommand().register(); }
+	}
+	
+	protected void loadPermissions() {
+		Events.PROVIDER_REGISTRATION_EVENT.register((event)->{
+			if (event.getProvider() instanceof PermissionProvider) {
+				PermissionProvider provider = (PermissionProvider) event.getProvider();
+				for (Field field : DefaultPermissions.class.getDeclaredFields()) {
+					try {
+						provider.registerPermission((String) field.get(null));
+					} catch (IllegalArgumentException | IllegalAccessException e) {}
+				}
+			}
+		});
+		if (CONFIG.loadPermissionModule) { registerProvider(PermissionManager.get()); }
+		if (loader.isModLoaded("fabric-permissions-api-v0")) {
+			PermissionCheckEvent.EVENT.register(new PermissionCheckEvent() {
+				
+				@Override
+				public @NotNull TriState onPermissionCheck(@NotNull CommandSource source, @NotNull String permission) {
+					try {
+						return getProvider(PermissionProvider.class).hasPermission(((ServerCommandSource)source).getPlayer(), permission) ? TriState.TRUE : TriState.DEFAULT;
+					} catch (Throwable e) {
+						return TriState.DEFAULT;
+					}
+				}
+				
+			});
+		}
+	}
+	
+	protected void loadCommands() {
+		if (CONFIG.loadTranslationCommand) { new TranslationCommand().register(); }
+		if (CONFIG.loadCommandModule) { registerProvider(CommandManager.get()); }
 	}
 	
 }

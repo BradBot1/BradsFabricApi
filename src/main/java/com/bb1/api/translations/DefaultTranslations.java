@@ -1,7 +1,5 @@
 package com.bb1.api.translations;
 
-import java.lang.reflect.Field;
-
 import com.bb1.api.Loader;
 
 import net.minecraft.text.TranslatableText;
@@ -35,6 +33,7 @@ public final class DefaultTranslations {
 	// TRANSLATIONS
 	
 	public static final TranslatableText TRANSLATIONS_UPDATED = Loader.getTranslatableText("translation.updated");
+	public static final TranslatableText TRANSLATIONS_UPDATED_FAIL = Loader.getTranslatableText("translation.updated_failed");
 	
 	// PERMISSIONS
 	
@@ -51,17 +50,9 @@ public final class DefaultTranslations {
 	public static final TranslatableText NEED_PERMISSIONS = Loader.getTranslatableText("error.required_permission");
 	/** When something is executed with improper arguments <i>(This includes if an argument is incorrect)</i>*/
 	public static final TranslatableText NEED_ARGUMENTS = Loader.getTranslatableText("error.required_arguments");
+	/** When a provider is needed but not found/doesnt exist */
+	public static final TranslatableText PROVIDER_NOT_FOUND = Loader.getTranslatableText("error.required_provider");
 	
-	private DefaultTranslations() {} // So no instance can be made of this class
-	
-	public static final void register() {
-		TranslationManager translationManager = TranslationManager.get();
-		for (Field field : DefaultTranslations.class.getDeclaredFields()) {
-			try {
-				TranslatableText text = (TranslatableText) field.get(null);
-				translationManager.setIfNotPresent(text.getKey(), TranslationManager.DEFAULT_LANG, text.getKey());
-			} catch (Throwable e) {}
-		}
-	}
+	private DefaultTranslations() { } // So no instance can be made of this class
 	
 }
