@@ -27,20 +27,22 @@ public class ApiConfig extends Config {
 		super("bradsfabricapi");
 	}
 	
-	// Toggling modules
+	@Storable public boolean debugMode = false;
+	
+	// Toggling Providers
 	
 	/**
 	 * If the server has a permission manager then the default one can be disabled
 	 */
-	@Storable public boolean loadPermissionModule = true;
+	@Storable public boolean loadPermissionProvider = true;
 	/**
 	 * If the server has another translation provider then this can be disabled
 	 */
-	@Storable public boolean loadTranslationModule = true;
+	@Storable public boolean loadTranslationProvider = true;
 	/**
 	 * If the server has their own way to register commands they can disable the default one
 	 */
-	@Storable public boolean loadCommandModule = true;
+	@Storable public boolean loadCommandProvider = true;
 	
 	// Toggling commands
 	

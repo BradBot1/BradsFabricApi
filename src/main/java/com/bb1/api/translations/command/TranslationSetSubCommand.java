@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.bb1.api.Loader;
 import com.bb1.api.commands.SubCommand;
+import com.bb1.api.commands.permissions.Permission;
 import com.bb1.api.commands.tab.ITabable;
 import com.bb1.api.commands.tab.TabableString;
 import com.bb1.api.permissions.DefaultPermissions;
@@ -57,7 +58,7 @@ public class TranslationSetSubCommand extends SubCommand {
 	}
 	
 	@Override
-	public @Nullable String getPermission() {
+	public @Nullable Permission getPermission() {
 		return DefaultPermissions.TRANSLATION_MODIFY;
 	}
 

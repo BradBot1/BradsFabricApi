@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.bb1.api.Loader;
 import com.bb1.api.commands.SubCommand;
+import com.bb1.api.commands.permissions.Permission;
 import com.bb1.api.commands.tab.ITabable;
 import com.bb1.api.permissions.DefaultPermissions;
 import com.bb1.api.providers.TranslationProvider;
@@ -49,7 +50,7 @@ public class TranslationCheckSubCommand extends SubCommand {
 	}
 	
 	@Override
-	public @Nullable String getPermission() {
+	public @Nullable Permission getPermission() {
 		return DefaultPermissions.TRANSLATION_VIEW;
 	}
 

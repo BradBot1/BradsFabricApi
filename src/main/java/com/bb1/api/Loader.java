@@ -4,13 +4,17 @@ import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.bb1.api.commands.Command;
 import com.bb1.api.commands.CommandManager;
+import com.bb1.api.commands.permissions.Permission;
 import com.bb1.api.config.command.ConfigCommand;
 import com.bb1.api.events.Events;
-import com.bb1.api.events.Events.LoadEvent;
 import com.bb1.api.events.Events.ProviderRegistrationEvent;
 import com.bb1.api.permissions.DefaultPermissions;
 import com.bb1.api.permissions.PermissionManager;
@@ -21,15 +25,13 @@ import com.bb1.api.translations.DefaultTranslations;
 import com.bb1.api.translations.TranslationManager;
 import com.bb1.api.translations.command.TranslationCommand;
 
-import me.lucko.fabric.api.permissions.v0.PermissionCheckEvent;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.api.DedicatedServerModInitializer;
-import net.fabricmc.fabric.api.util.TriState;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 /**
  * Copyright 2021 BradBot_1
@@ -68,9 +70,12 @@ public class Loader implements DedicatedServerModInitializer {
 	
 	private static final Set<Provider> PROVIDERS = new HashSet<Provider>();
 	
+	private static final Logger LOGGER = LogManager.getLogger("BFAPI");
+	
 	public static void registerProvider(@NotNull Provider provider) {
 		if (PROVIDERS.contains(provider)) return;
 		PROVIDERS.add(provider);
+		if (CONFIG.debugMode) LOGGER.info("Registered the provider "+provider.getProviderName());
 		Events.PROVIDER_REGISTRATION_EVENT.onEvent(new ProviderRegistrationEvent(provider));
 	}
 	
@@ -100,16 +105,67 @@ public class Loader implements DedicatedServerModInitializer {
 	}
 	
 	public static final ApiConfig CONFIG = new ApiConfig();
-	private final FabricLoader loader = FabricLoader.getInstance();
 	
 	@Override
 	public void onInitializeServer() {
+		
+		new Command("test") {
+			
+			@Override
+			public int execute(ServerCommandSource source, String alias, String[] params) {
+				source.sendFeedback(new LiteralText("hi"), false);
+				return 1;
+			}
+			
+			@Override
+			public Permission getPermission() {
+				return new Permission(DefaultPermissions.TRANSLATION_VIEW.permission(), 4);
+			}
+			
+		}.register();
+		
+		new Command("test2") {
+			
+			@Override
+			public int execute(ServerCommandSource source, String alias, String[] params) {
+				PermissionProvider provider = Loader.getProvider(PermissionProvider.class);
+				if (provider.hasPermission(getServerPlayerEntity(source), DefaultPermissions.TRANSLATION_VIEW.permission())) {
+					provider.takePermission(getServerPlayerEntity(source), DefaultPermissions.TRANSLATION_VIEW.permission());
+				} else {
+					provider.givePermission(getServerPlayerEntity(source), DefaultPermissions.TRANSLATION_VIEW.permission());
+				}
+				source.sendFeedback(new LiteralText("toggled"), false);
+				return 1;
+			}
+			
+		}.register();
+		
+		new Command("test3") {
+			
+			@Override
+			public int execute(ServerCommandSource source, String alias, String[] params) {
+				PermissionProvider provider = Loader.getProvider(PermissionProvider.class);
+				source.sendFeedback(new LiteralText(""+provider.hasPermission(getServerPlayerEntity(source), DefaultPermissions.TRANSLATION_VIEW.permission())), false);
+				source.sendFeedback(new LiteralText(""+Permissions.check(getServerPlayerEntity(source), DefaultPermissions.TRANSLATION_VIEW.permission())), false);
+				return 1;
+			}
+			
+		}.register();
+		
 		CONFIG.load();
-		// Load translations
+		if (CONFIG.debugMode) {
+			LOGGER.log(Level.WARN, " ");
+			LOGGER.log(Level.WARN, " ");
+			LOGGER.log(Level.WARN, " ");
+			LOGGER.log(Level.WARN, "Debug mode is enabled, it is recommended that you disable debug mode unless it is needed to remove console clutter");
+			LOGGER.log(Level.WARN, " ");
+			LOGGER.log(Level.WARN, " ");
+			LOGGER.log(Level.WARN, " ");
+		}
 		loadTranslations();
-		// Load commands
 		loadCommands();
-		Events.LOAD_EVENT.onEvent(new LoadEvent());
+		loadPermissions();
+		loadProviders();
 		Events.UNLOAD_EVENT.register((e)->CONFIG.save());
 	}
 	
@@ -125,10 +181,13 @@ public class Loader implements DedicatedServerModInitializer {
 				provider.save();
 			}
 		});
+		if (CONFIG.loadPermissionProvider) Loader.registerProvider(PermissionManager.get());
+		if (CONFIG.loadTranslationProvider) Loader.registerProvider(TranslationManager.get());
+		if (CONFIG.loadCommandProvider) Loader.registerProvider(CommandManager.get());
 	}
 	
 	protected void loadTranslations() {
-		Events.PROVIDER_REGISTRATION_EVENT.register((event)->{
+		Events.PROVIDER_INFO_EVENT.register((event)->{
 			if (event.getProvider() instanceof TranslationProvider) {
 				TranslationProvider provider = (TranslationProvider) event.getProvider();
 				for (Field field : DefaultTranslations.class.getDeclaredFields()) {
@@ -139,41 +198,17 @@ public class Loader implements DedicatedServerModInitializer {
 				}
 			}
 		});
-		if (loader.isModLoaded("server_translations") && CONFIG.loadTranslationModule) { registerProvider(TranslationManager.get()); }
 		if (CONFIG.loadTranslationCommand) { new ConfigCommand().register(); }
 	}
 	
 	protected void loadPermissions() {
-		Events.PROVIDER_REGISTRATION_EVENT.register((event)->{
-			if (event.getProvider() instanceof PermissionProvider) {
-				PermissionProvider provider = (PermissionProvider) event.getProvider();
-				for (Field field : DefaultPermissions.class.getDeclaredFields()) {
-					try {
-						provider.registerPermission((String) field.get(null));
-					} catch (IllegalArgumentException | IllegalAccessException e) {}
-				}
-			}
+		Events.LOAD_EVENT.register((event)->{
+			getProvider(PermissionProvider.class).registerPermissions(minecraftServer.getCommandManager().getDispatcher());
 		});
-		if (CONFIG.loadPermissionModule) { registerProvider(PermissionManager.get()); }
-		if (loader.isModLoaded("fabric-permissions-api-v0")) {
-			PermissionCheckEvent.EVENT.register(new PermissionCheckEvent() {
-				
-				@Override
-				public @NotNull TriState onPermissionCheck(@NotNull CommandSource source, @NotNull String permission) {
-					try {
-						return getProvider(PermissionProvider.class).hasPermission(((ServerCommandSource)source).getPlayer(), permission) ? TriState.TRUE : TriState.DEFAULT;
-					} catch (Throwable e) {
-						return TriState.DEFAULT;
-					}
-				}
-				
-			});
-		}
 	}
 	
 	protected void loadCommands() {
 		if (CONFIG.loadTranslationCommand) { new TranslationCommand().register(); }
-		if (CONFIG.loadCommandModule) { registerProvider(CommandManager.get()); }
 	}
 	
 }

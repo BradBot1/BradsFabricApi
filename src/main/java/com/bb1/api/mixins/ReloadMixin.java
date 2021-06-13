@@ -1,5 +1,8 @@
 package com.bb1.api.mixins;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -8,10 +11,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.bb1.api.datapacks.DatapackManager;
+import com.bb1.api.events.Events;
+import com.bb1.api.events.Events.ReloadEvent;
 
 import net.minecraft.resource.ReloadableResourceManager;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceReloader;
 import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.server.command.CommandManager;
+import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.DynamicRegistryManager;
 
 /**
@@ -37,5 +45,15 @@ public class ReloadMixin {
     @Inject(method = "<init>", at = @At("TAIL"))
     public void addReloadHandlers(DynamicRegistryManager registryManager, CommandManager.RegistrationEnvironment commandEnvironment, int functionPermissionLevel, CallbackInfo ci) {
         resourceManager.registerReloader(DatapackManager.get());
+        resourceManager.registerReloader(new ReloadHandler());
+    }
+    
+    public static final class ReloadHandler implements ResourceReloader {
+
+		@Override
+		public CompletableFuture<Void> reload(Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
+			return CompletableFuture.supplyAsync(() -> null, prepareExecutor).thenCompose(synchronizer::whenPrepared).thenAcceptAsync(nul -> Events.RELOAD_EVENT.onEvent(new ReloadEvent()), applyExecutor);
+		}
+    	
     }
 }

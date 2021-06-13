@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import com.bb1.api.commands.SubCommand;
+import com.bb1.api.commands.permissions.Permission;
 import com.bb1.api.commands.tab.ITabable;
 import com.bb1.api.permissions.DefaultPermissions;
 import com.bb1.api.translations.DefaultTranslations;
@@ -63,7 +64,7 @@ public class ConfigCheckSubCommand extends SubCommand {
 	}
 	
 	@Override
-	public String getPermission() {
+	public Permission getPermission() {
 		return DefaultPermissions.CONFIG_VIEW;
 	}
 	

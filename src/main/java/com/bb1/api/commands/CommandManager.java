@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
 
 import com.bb1.api.Loader;
 import com.bb1.api.commands.tab.ITabable;
+import com.bb1.api.events.Events;
+import com.bb1.api.events.Events.ProviderInformationEvent;
 import com.bb1.api.providers.CommandProvider;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -45,8 +47,11 @@ public final class CommandManager implements CommandProvider {
 	
 	private Set<RegisterableCommand> commands = new HashSet<RegisterableCommand>();
 	
+	private boolean debug = Loader.CONFIG.debugMode;
+	
 	private CommandManager() {
-		if (!Loader.CONFIG.loadCommandModule) return;
+		if (!Loader.CONFIG.loadCommandProvider) return;
+		Events.PROVIDER_INFO_EVENT.onEvent(new ProviderInformationEvent(this));
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
 			for (RegisterableCommand registerableCommand : commands) {
 				final Command command = registerableCommand.getInner();
@@ -118,23 +123,14 @@ public final class CommandManager implements CommandProvider {
 	
 	public void registerCommand(@NotNull Command command) {
 		this.commands.add(new RegisterableCommand(command));
+		if (debug) getProviderLogger().info("Registered the command "+command.name);
 	}
 	
 	@Nullable
 	public Command getCommandByName(@NotNull String name) {
-		for (RegisterableCommand registerableCommand : this.commands) {
-			final Command command = registerableCommand.getInner();
-			if (command.getName().equalsIgnoreCase(name)) {
-				return command;
-			}
-			if (command.getAliases()!=null && command.getAliases().size()>0) {
-				for (String string : command.getAliases()) {
-					if (string.equalsIgnoreCase(name)) {
-						return command;
-					}
-				}
-			}
-		}
+		RegisterableCommand registerableCommand = getRegisterableByName(name);
+		if (registerableCommand!=null) return registerableCommand.getInner();
+		if (debug) getProviderLogger().error("Failed to find the registered command \""+name+"\", it must be an external command");
 		return null;
 	}
 	

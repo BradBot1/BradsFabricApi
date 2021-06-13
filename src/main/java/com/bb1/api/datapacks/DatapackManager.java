@@ -8,9 +8,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
-import com.bb1.api.events.Events;
-import com.bb1.api.events.Events.ReloadEvent;
-
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReloader;
 import net.minecraft.util.Identifier;
@@ -61,7 +58,7 @@ public final class DatapackManager implements ResourceReloader {
 			for (Entry<Identifier, Collection<Identifier>> entry : map.entrySet()) {
 				addons.get(entry.getKey()).reload(manager, entry.getValue());
 			}
-			Events.RELOAD_EVENT.onEvent(new ReloadEvent());
+			// Events.RELOAD_EVENT.onEvent(new ReloadEvent());
         }, applyExecutor);
 	}
 

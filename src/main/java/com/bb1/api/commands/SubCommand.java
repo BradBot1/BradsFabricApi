@@ -5,6 +5,7 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.bb1.api.commands.permissions.Permission;
 import com.bb1.api.commands.tab.ITabable;
 
 /**
@@ -36,7 +37,7 @@ public abstract class SubCommand implements CommandHandler {
 	public Set<String> getAliases() { return null; }
 	
 	@Nullable
-	public String getPermission() { return null; }
+	public Permission getPermission() { return null; }
 	
 	@Nullable
 	public ITabable[] getParams() { return null; }

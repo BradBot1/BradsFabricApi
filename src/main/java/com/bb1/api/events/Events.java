@@ -7,13 +7,13 @@ import org.jetbrains.annotations.Nullable;
 
 import com.bb1.api.ApiConfig;
 import com.bb1.api.Loader;
-import com.bb1.api.commands.CommandManager;
 import com.bb1.api.config.Config;
 import com.bb1.api.datapacks.DatapackManager;
-import com.bb1.api.permissions.PermissionManager;
 import com.bb1.api.providers.Provider;
-import com.bb1.api.translations.TranslationManager;
 
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.server.MinecraftServer;
@@ -41,7 +41,7 @@ public final class Events {
 	public static final Event<LoadEvent> LOAD_EVENT = new Event<LoadEvent>();
 	/** Called when minecraft beings to stop */
 	public static final Event<UnloadEvent> UNLOAD_EVENT = new Event<UnloadEvent>();
-	/** Called when a message is sent to a client<br><i>(cancelling only stops the message being sent to the client as this event is called after the message has already been handled by the server)</i>*/
+	/** Called when a message is sent to a client<br><i>(cancelling only stops the message being sent to the client as this event is called after the message has already been handled by the server)</i> */
 	public static final Event<ChatEvent> MESSAGE_EVENT = new Event<ChatEvent>();
 	/** Called when a config saves, loads or needs to have its instances refreshed<br><i>(this is automatically handled by the config unless disabled)</i> */
 	public static final Event<ConfigChangeEvent> CONFIG_EVENT = new Event<ConfigChangeEvent>();
@@ -51,8 +51,14 @@ public final class Events {
 	public static final Event<ReloadEvent> RELOAD_EVENT = new Event<ReloadEvent>();
 	
 	public static final Event<TickEvent> TICK_EVENT = new Event<TickEvent>();
-	
+	/** Called when a provider registers itself */
 	public static final Event<ProviderRegistrationEvent> PROVIDER_REGISTRATION_EVENT = new Event<ProviderRegistrationEvent>();
+	/** Called when a provider requests information<br><i>(like when the permission provider wants permissions)</i> */
+	public static final Event<ProviderInformationEvent> PROVIDER_INFO_EVENT = new Event<ProviderInformationEvent>();
+	/** Called when a minecraft loads data from the players .dat file */
+	public static final Event<PlayerNBTReadEvent> PLAYER_NBT_READ_EVENT = new Event<PlayerNBTReadEvent>();
+	
+	public static final Event<PlayerNBTWriteEvent> PLAYER_NBT_WRITE_EVENT = new Event<PlayerNBTWriteEvent>();
 
 	private Events() { }
 	
@@ -60,15 +66,6 @@ public final class Events {
 		
 		@Nullable
 		public MinecraftServer getMinecraftServer() { return Loader.getMinecraftServer(); }
-		
-		@NotNull
-		public CommandManager getCommandManager() { return CommandManager.get(); }
-		
-		@NotNull
-		public TranslationManager getTranslationManager() { return TranslationManager.get(); }
-		/** May be null if disabled in {@link ApiConfig} */
-		@Nullable
-		public PermissionManager getPermissionManager() { return getConfig().loadPermissionModule ? PermissionManager.get() : null; }
 		
 		@NotNull
 		public ApiConfig getConfig() { return Loader.CONFIG; }
@@ -82,15 +79,6 @@ public final class Events {
 		
 		@Nullable
 		public MinecraftServer getMinecraftServer() { return Loader.getMinecraftServer(); }
-		
-		@NotNull
-		public CommandManager getCommandManager() { return CommandManager.get(); }
-		
-		@NotNull
-		public TranslationManager getTranslationManager() { return TranslationManager.get(); }
-		/** May be null if disabled in {@link ApiConfig} */
-		@Nullable
-		public PermissionManager getPermissionManager() { return getConfig().loadPermissionModule ? PermissionManager.get() : null; }
 		
 		@NotNull
 		public ApiConfig getConfig() { return Loader.CONFIG; }
@@ -167,12 +155,6 @@ public final class Events {
 		public MinecraftServer getMinecraftServer() { return Loader.getMinecraftServer(); }
 		
 		@NotNull
-		public TranslationManager getTranslationManager() { return TranslationManager.get(); }
-		/** May be null if disabled in {@link ApiConfig} */
-		@Nullable
-		public PermissionManager getPermissionManager() { return getConfig().loadPermissionModule ? PermissionManager.get() : null; }
-		
-		@NotNull
 		public ApiConfig getConfig() { return Loader.CONFIG; }
 		
 	}
@@ -186,6 +168,46 @@ public final class Events {
 		public ProviderRegistrationEvent(@NotNull Provider provider) { this.provider = provider; }
 		
 		public Provider getProvider() { return this.provider; }
+		
+	}
+	
+	public static class ProviderInformationEvent {
+		
+		private final Provider provider;
+		
+		public ProviderInformationEvent(@NotNull Provider provider) { this.provider = provider; }
+		
+		public Provider getProvider() { return this.provider; }
+		
+	}
+	
+	public static class PlayerNBTReadEvent implements PlayerEvent {
+		
+		private final ServerPlayerEntity player;
+		
+		private final NbtCompound nbt;
+		
+		public PlayerNBTReadEvent(@NotNull ServerPlayerEntity player, @NotNull NbtCompound nbt) { this.player = player; this.nbt = nbt; }
+
+		@Override
+		public PlayerEntity getPlayerEntity() { return player; }
+		@Nullable
+		public NbtElement getNBT(@NotNull String key) { return this.nbt.get(key); }
+		
+	}
+	
+	public static class PlayerNBTWriteEvent implements PlayerEvent {
+		
+		private final ServerPlayerEntity player;
+		
+		private final NbtCompound nbt;
+		
+		public PlayerNBTWriteEvent(@NotNull ServerPlayerEntity player, @NotNull NbtCompound nbt) { this.player = player; this.nbt = nbt; }
+
+		@Override
+		public ServerPlayerEntity getPlayerEntity() { return player; }
+		
+		public void addNBT(@NotNull String key, @NotNull NbtElement nbt) { this.nbt.put(key, nbt); }
 		
 	}
 	

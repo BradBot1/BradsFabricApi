@@ -6,7 +6,8 @@
   "mixins": [
   	"MinecraftServerMixin",
   	"ChatMixin",
-  	"ReloadMixin"
+  	"ReloadMixin",
+  	"PlayerNBTMixin"
   ],
   "client": [],
   "injectors": {

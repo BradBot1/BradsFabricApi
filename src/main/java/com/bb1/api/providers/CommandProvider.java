@@ -1,5 +1,7 @@
 package com.bb1.api.providers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,5 +13,8 @@ public interface CommandProvider extends Provider {
 	
 	@Nullable
 	public Command getCommandByName(@NotNull String name);
+	
+	@Override
+	public default Logger getProviderLogger() { return LogManager.getLogger("CommandProvider | "+getProviderName()); }
 	
 }

@@ -16,6 +16,8 @@ import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
 import com.bb1.api.Loader;
+import com.bb1.api.events.Events;
+import com.bb1.api.events.Events.ProviderInformationEvent;
 import com.bb1.api.providers.TranslationProvider;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,7 +28,6 @@ import com.google.gson.JsonParser;
 import fr.catcore.server.translations.api.ServerTranslations;
 import fr.catcore.server.translations.api.resource.language.ServerLanguageDefinition;
 import fr.catcore.server.translations.api.resource.language.TranslationMap;
-import fr.catcore.server.translations.api.resource.language.TranslationsReloadListener;
 
 /**
  * Copyright 2021 BradBot_1
@@ -43,7 +44,7 @@ import fr.catcore.server.translations.api.resource.language.TranslationsReloadLi
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public final class TranslationManager implements TranslationsReloadListener, TranslationProvider {
+public final class TranslationManager implements TranslationProvider {
 	/**
 	 * The instance of {@link ServerTranslations} that we use to modify translations
 	 */
@@ -67,8 +68,11 @@ public final class TranslationManager implements TranslationsReloadListener, Tra
 	 */
 	private final Map<String, TranslationMap> translations = new HashMap<>();
 	
+	private boolean debug = Loader.CONFIG.debugMode;
+	
 	private TranslationManager() {
-		SERVER_TRANSLATIONS.registerReloadListener(this);
+		if (!Loader.CONFIG.loadTranslationProvider) return;
+		Events.LOAD_EVENT.register((event)->Events.PROVIDER_INFO_EVENT.onEvent(new ProviderInformationEvent(this)));
 	}
 	/**
 	 * Converts the translation list to json
@@ -111,12 +115,14 @@ public final class TranslationManager implements TranslationsReloadListener, Tra
 		TranslationMap translationMap = translations.getOrDefault(lang, new TranslationMap());
 		translationMap.put(translation_key, value);
 		translations.put(lang, translationMap);
+		if (debug) getProviderLogger().info("Set the translation "+translation_key+" to "+value+" in "+lang);
 	}
 	
 	public void setIfNotPresent(String translation_key, String lang, String value) {
 		TranslationMap translationMap = translations.getOrDefault(lang, new TranslationMap());
 		if (!translationMap.contains(translation_key)) translationMap.put(translation_key, value);
 		translations.put(lang, translationMap);
+		if (debug) getProviderLogger().info("Regsitered the translation "+translation_key);
 	}
 	
 	public Set<String> getLangs() {
@@ -126,15 +132,6 @@ public final class TranslationManager implements TranslationsReloadListener, Tra
 		}
 		set.add(DEFAULT_LANG);
 		return set;
-	}
-	/**
-	 * Called when translations should be reloaded
-	 */
-	@Override
-	public void reload() {
-		load();
-		pushTranslations();
-		save();
 	}
 	
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -156,9 +153,9 @@ public final class TranslationManager implements TranslationsReloadListener, Tra
 			s.close();
 			JsonElement contents = PARSER.parse(String.join("", r));
 			addFromJson(contents.getAsJsonObject());
-			pushTranslations();
+			if (debug) getProviderLogger().info("Loaded translations from file");
 		} catch (IOException e) {
-			// TODO: log that we failed to load
+			if (debug) getProviderLogger().info("Failed to load transtlations");
 		}
 	}
 	
@@ -171,9 +168,9 @@ public final class TranslationManager implements TranslationsReloadListener, Tra
 			b.write(GSON.toJson(convertLangToJson()));
 			b.flush();
 			b.close();
-			pushTranslations();
+			if (debug) getProviderLogger().info("Saved translations to file");
 		} catch (Throwable e) {
-			// TODO: log that we failed to save
+			if (debug) getProviderLogger().info("Failed to save transtlations");
 		}
 	}
 	
@@ -194,6 +191,7 @@ public final class TranslationManager implements TranslationsReloadListener, Tra
 		for (String s : getLangs()) {
 			SERVER_TRANSLATIONS.addTranslations(s, new Supplier<TranslationMap>() { @Override public TranslationMap get() { return translations.getOrDefault(s, new TranslationMap()); }});
 		}
+		if (debug) getProviderLogger().info("Pushed all translations");
 	}
 	
 }

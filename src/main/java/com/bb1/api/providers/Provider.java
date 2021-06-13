@@ -1,5 +1,8 @@
 package com.bb1.api.providers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -23,4 +26,6 @@ public interface Provider {
 	 * @apiNote Used to instruct a provider to delete its current data and load data from its saving location
 	 */
 	public default void load() { }
+	
+	public default Logger getProviderLogger() { return LogManager.getLogger("Provider | "+getProviderName()); }
 }

@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.bb1.api.Loader;
 import com.bb1.api.events.Events;
 import com.bb1.api.events.Events.AutoSaveEvent;
+import com.bb1.api.events.Events.LoadEvent;
 import com.bb1.api.events.Events.TickEvent;
 import com.bb1.api.events.Events.UnloadEvent;
 
@@ -37,6 +38,7 @@ public class MinecraftServerMixin {
 	@Inject(method = "runServer()V", at = @At(value = "HEAD"))
 	public void serverRan(CallbackInfo callbackInfo) {
 		Loader.setMinecraftServer((MinecraftServer) (Object) this);
+		Events.LOAD_EVENT.onEvent(new LoadEvent());
 	}
 	
 	@Inject(method = "shutdown()V", at = @At("HEAD"))

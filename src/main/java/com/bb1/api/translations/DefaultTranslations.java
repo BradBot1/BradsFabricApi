@@ -35,13 +35,6 @@ public final class DefaultTranslations {
 	public static final TranslatableText TRANSLATIONS_UPDATED = Loader.getTranslatableText("translation.updated");
 	public static final TranslatableText TRANSLATIONS_UPDATED_FAIL = Loader.getTranslatableText("translation.updated_failed");
 	
-	// PERMISSIONS
-	
-	public static final TranslatableText PERMISSION_HAS = Loader.getTranslatableText("permission.has");
-	public static final TranslatableText PERMISSION_DOESNT_HAVE = Loader.getTranslatableText("permission.hasnt");
-	public static final TranslatableText PERMISSION_TAKEN = Loader.getTranslatableText("permission.taken");
-	public static final TranslatableText PERMISSION_GIVEN = Loader.getTranslatableText("permission.given");
-	
 	// GENERIC ERRORS
 	
 	public static final TranslatableText PLAYER_ONLY = Loader.getTranslatableText("error.player_only");

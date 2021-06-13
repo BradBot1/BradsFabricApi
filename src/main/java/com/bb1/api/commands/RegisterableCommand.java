@@ -6,9 +6,9 @@ import java.util.List;
 import com.bb1.api.Loader;
 import com.bb1.api.commands.tab.ITabable;
 import com.bb1.api.commands.tab.TabableSubCommand;
+import com.bb1.api.providers.PermissionProvider;
 import com.bb1.api.translations.DefaultTranslations;
 
-import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -49,10 +49,6 @@ public class RegisterableCommand {
 	}
 	
 	public int execute(ServerCommandSource commandSource, String commandLabel, String[] args) {
-		if (c.getPermission()!=null && !Permissions.check(commandSource, c.getPermission())) {
-			commandSource.sendFeedback(DefaultTranslations.NEED_PERMISSIONS, false);
-			return 0;
-		}
 		ServerPlayerEntity player = Loader.getServerPlayerEntity(commandSource);
 		for (int i = 0; i < args.length; i++) {
 			try {
@@ -60,7 +56,8 @@ public class RegisterableCommand {
 				if (t instanceof TabableSubCommand) {
 					TabableSubCommand ts = (TabableSubCommand) t;
 					SubCommand sub = ts.getSubCommand(args[i]);
-					if (c.getPermission()!=null && !Permissions.check(commandSource, sub.getPermission())) {
+					PermissionProvider provider = Loader.getProvider(PermissionProvider.class);
+					if (provider!=null && !provider.hasPermission(player, sub.getPermission().permission())) {
 						commandSource.sendFeedback(DefaultTranslations.NEED_PERMISSIONS, false);
 						return 0;
 					}
@@ -83,9 +80,6 @@ public class RegisterableCommand {
 	}
 	
 	public List<Text> tabComplete(ServerCommandSource commandSource, String alias, String[] args) {
-		if (c.getPermission()!=null && !Permissions.check(commandSource, c.getPermission())) {
-			return new ArrayList<Text>(); // Just default to showing the '?' error
-		}
 		if (c.getParams()==null || c.getParams().length==0) {
 			return new ArrayList<Text>();
 		} else {

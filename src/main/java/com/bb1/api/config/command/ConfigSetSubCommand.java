@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import com.bb1.api.commands.SubCommand;
+import com.bb1.api.commands.permissions.Permission;
 import com.bb1.api.commands.tab.ITabable;
 import com.bb1.api.commands.tab.TabableString;
 import com.bb1.api.config.Config;
@@ -106,7 +107,7 @@ public class ConfigSetSubCommand extends SubCommand {
 	}
 	
 	@Override
-	public String getPermission() {
+	public Permission getPermission() {
 		return DefaultPermissions.CONFIG_MODIFY;
 	}
 
