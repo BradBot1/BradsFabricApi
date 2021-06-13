@@ -10,13 +10,10 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.bb1.api.commands.Command;
 import com.bb1.api.commands.CommandManager;
-import com.bb1.api.commands.permissions.Permission;
 import com.bb1.api.config.command.ConfigCommand;
 import com.bb1.api.events.Events;
 import com.bb1.api.events.Events.ProviderRegistrationEvent;
-import com.bb1.api.permissions.DefaultPermissions;
 import com.bb1.api.permissions.PermissionManager;
 import com.bb1.api.providers.PermissionProvider;
 import com.bb1.api.providers.Provider;
@@ -25,13 +22,11 @@ import com.bb1.api.translations.DefaultTranslations;
 import com.bb1.api.translations.TranslationManager;
 import com.bb1.api.translations.command.TranslationCommand;
 
-import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 /**
  * Copyright 2021 BradBot_1
@@ -108,50 +103,6 @@ public class Loader implements DedicatedServerModInitializer {
 	
 	@Override
 	public void onInitializeServer() {
-		
-		new Command("test") {
-			
-			@Override
-			public int execute(ServerCommandSource source, String alias, String[] params) {
-				source.sendFeedback(new LiteralText("hi"), false);
-				return 1;
-			}
-			
-			@Override
-			public Permission getPermission() {
-				return new Permission(DefaultPermissions.TRANSLATION_VIEW.permission(), 4);
-			}
-			
-		}.register();
-		
-		new Command("test2") {
-			
-			@Override
-			public int execute(ServerCommandSource source, String alias, String[] params) {
-				PermissionProvider provider = Loader.getProvider(PermissionProvider.class);
-				if (provider.hasPermission(getServerPlayerEntity(source), DefaultPermissions.TRANSLATION_VIEW.permission())) {
-					provider.takePermission(getServerPlayerEntity(source), DefaultPermissions.TRANSLATION_VIEW.permission());
-				} else {
-					provider.givePermission(getServerPlayerEntity(source), DefaultPermissions.TRANSLATION_VIEW.permission());
-				}
-				source.sendFeedback(new LiteralText("toggled"), false);
-				return 1;
-			}
-			
-		}.register();
-		
-		new Command("test3") {
-			
-			@Override
-			public int execute(ServerCommandSource source, String alias, String[] params) {
-				PermissionProvider provider = Loader.getProvider(PermissionProvider.class);
-				source.sendFeedback(new LiteralText(""+provider.hasPermission(getServerPlayerEntity(source), DefaultPermissions.TRANSLATION_VIEW.permission())), false);
-				source.sendFeedback(new LiteralText(""+Permissions.check(getServerPlayerEntity(source), DefaultPermissions.TRANSLATION_VIEW.permission())), false);
-				return 1;
-			}
-			
-		}.register();
-		
 		CONFIG.load();
 		if (CONFIG.debugMode) {
 			LOGGER.log(Level.WARN, " ");
