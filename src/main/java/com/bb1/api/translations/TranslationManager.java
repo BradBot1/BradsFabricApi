@@ -2,7 +2,6 @@ package com.bb1.api.translations;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,7 +59,7 @@ public final class TranslationManager implements TranslationProvider {
 	/**
 	 * The language to register translations to if no translations are known
 	 */
-	public static final String DEFAULT_LANG = (SERVER_TRANSLATIONS.getDefaultLanguage().definition().code()==null) ? "unkown" : SERVER_TRANSLATIONS.getDefaultLanguage().definition().code();
+	protected final static String DEFAULT_LANG = ServerLanguageDefinition.DEFAULT_CODE;
 	/**
 	 * In the format regional -> translationKey -> value
 	 */
@@ -83,6 +82,7 @@ public final class TranslationManager implements TranslationProvider {
 	public JsonObject convertLangToJson() {
 		JsonObject regionals = new JsonObject();
 		for (Entry<String, TranslationMap> entry : translations.entrySet()) {
+			if (entry.getKey()==null) continue;
 			JsonObject translations = new JsonObject();
 			for (Entry<String, String> entry2 : entry.getValue().entrySet()) {
 				translations.addProperty(entry2.getKey(), entry2.getValue());
@@ -157,7 +157,7 @@ public final class TranslationManager implements TranslationProvider {
 			JsonElement contents = PARSER.parse(String.join("", r));
 			addFromJson(contents.getAsJsonObject());
 			if (debug) getProviderLogger().info("Loaded translations from file");
-		} catch (IOException e) {
+		} catch (Throwable e) {
 			if (debug) getProviderLogger().info("Failed to load transtlations");
 		}
 	}
@@ -173,6 +173,7 @@ public final class TranslationManager implements TranslationProvider {
 			b.close();
 			if (debug) getProviderLogger().info("Saved translations to file");
 		} catch (Throwable e) {
+			e.printStackTrace();
 			if (debug) getProviderLogger().info("Failed to save transtlations");
 		}
 	}
