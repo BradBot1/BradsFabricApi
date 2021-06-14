@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "bradsfabricapi",
+  "id": "bfapi",
   "version": "${version}",
 
-  "name": "BradsFabricApi",
+  "name": "BFAPI",
   "description": "A serverside mod to make the creation of other server side mods easier",
   "authors": [
     "BradBot_1"

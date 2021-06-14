@@ -50,7 +50,7 @@ public class Loader implements DedicatedServerModInitializer {
 	 * @param key The key for the text
 	 */
 	public static TranslatableText getTranslatableText(String key) {
-		return new TranslatableText("bradsfabricapi."+key);
+		return new TranslatableText("bfapi."+key);
 	}
 	
 	private static MinecraftServer minecraftServer;

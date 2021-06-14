@@ -24,7 +24,7 @@ import com.bb1.api.config.Storable;
 public class ApiConfig extends Config {
 
 	public ApiConfig() {
-		super("bradsfabricapi");
+		super("bfapi");
 	}
 	
 	@Storable public boolean debugMode = false;
