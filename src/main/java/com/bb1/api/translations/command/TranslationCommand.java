@@ -35,7 +35,7 @@ public final class TranslationCommand extends Command {
 
 	@Override
 	public int execute(ServerCommandSource source, String alias, String[] params) {
-		source.sendFeedback(DefaultTranslations.NEED_ARGUMENTS, false);
+		source.sendFeedback(DefaultTranslations.NEED_ARGUMENTS.translatableText(), false);
 		return 1;
 	}
 	

@@ -58,7 +58,7 @@ public class RegisterableCommand {
 					SubCommand sub = ts.getSubCommand(args[i]);
 					PermissionProvider provider = Loader.getProvider(PermissionProvider.class);
 					if (provider!=null && !provider.hasPermission(player, sub.getPermission().permission())) {
-						commandSource.sendFeedback(DefaultTranslations.NEED_PERMISSIONS, false);
+						commandSource.sendFeedback(DefaultTranslations.NEED_PERMISSIONS.translatableText(), false);
 						return 0;
 					}
 					return sub.execute(commandSource, commandLabel, copyAfter(args, i));
@@ -71,7 +71,7 @@ public class RegisterableCommand {
 			if (player!=null) {
 				return this.c.execute(commandSource, commandLabel, args);
 			} else {
-				commandSource.sendFeedback(DefaultTranslations.PLAYER_ONLY_COMMAND, false);
+				commandSource.sendFeedback(DefaultTranslations.PLAYER_ONLY_COMMAND.translatableText(), false);
 				return 0;
 			}
 		} else {

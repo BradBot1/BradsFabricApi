@@ -1,6 +1,7 @@
 package com.bb1.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,12 @@ public class CollectionUtils {
 			set.add(t);
 		}
 		return list;
+	}
+	
+	public static <T> Collection<T> clone(Collection<T> collection) {
+		List<T> list = new ArrayList<T>();
+		list.addAll(collection);
+		return (list.size()<1) ? collection : list;
 	}
 	
 }

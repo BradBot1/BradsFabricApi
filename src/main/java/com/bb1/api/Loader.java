@@ -14,11 +14,14 @@ import com.bb1.api.commands.CommandManager;
 import com.bb1.api.config.command.ConfigCommand;
 import com.bb1.api.events.Events;
 import com.bb1.api.events.Events.ProviderRegistrationEvent;
+import com.bb1.api.gamerules.GameRuleManager;
+import com.bb1.api.gamerules.StringGameRule;
 import com.bb1.api.permissions.PermissionManager;
 import com.bb1.api.providers.PermissionProvider;
 import com.bb1.api.providers.Provider;
 import com.bb1.api.providers.TranslationProvider;
 import com.bb1.api.translations.DefaultTranslations;
+import com.bb1.api.translations.Translation;
 import com.bb1.api.translations.TranslationManager;
 import com.bb1.api.translations.command.TranslationCommand;
 
@@ -28,6 +31,7 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.world.GameRules.Category;
 /**
  * Copyright 2021 BradBot_1
  * 
@@ -103,6 +107,9 @@ public class Loader implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
+		
+		new StringGameRule("testGameRule", "owo", Category.MISC).register();
+		
 		CONFIG.load();
 		if (CONFIG.debugMode) {
 			LOGGER.log(Level.WARN, " ");
@@ -135,31 +142,32 @@ public class Loader implements ModInitializer {
 		if (CONFIG.loadPermissionProvider) Loader.registerProvider(PermissionManager.get());
 		if (CONFIG.loadTranslationProvider) Loader.registerProvider(TranslationManager.get());
 		if (CONFIG.loadCommandProvider) Loader.registerProvider(CommandManager.get());
+		if (CONFIG.loadGameRuleProvider) Loader.registerProvider(GameRuleManager.get());
 	}
 	
 	protected void loadTranslations() {
 		Events.PROVIDER_INFO_EVENT.register((event)->{
 			if (event.getProvider() instanceof TranslationProvider) {
-				TranslationProvider provider = (TranslationProvider) event.getProvider();
 				for (Field field : DefaultTranslations.class.getDeclaredFields()) {
 					try {
-						TranslatableText text = (TranslatableText) field.get(null);
-						provider.registerTranslation(text.getKey(), null);
+						Translation text = (Translation) field.get(null);
+						event.give(text);
 					} catch (Throwable e) {}
 				}
 			}
 		});
-		if (CONFIG.loadTranslationCommand) { new ConfigCommand().register(); }
 	}
 	
 	protected void loadPermissions() {
 		Events.LOAD_EVENT.register((event)->{
-			getProvider(PermissionProvider.class).registerPermissions(minecraftServer.getCommandManager().getDispatcher());
+			PermissionProvider provider = Loader.getProvider(PermissionProvider.class);
+			if (provider!=null) { provider.registerPermissions(minecraftServer.getCommandManager().getDispatcher()); }
 		});
 	}
 	
 	protected void loadCommands() {
 		if (CONFIG.loadTranslationCommand) { new TranslationCommand().register(); }
+		if (CONFIG.loadConfigCommand) { new ConfigCommand().register(); }
 	}
 	
 }

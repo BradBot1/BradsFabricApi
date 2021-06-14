@@ -38,12 +38,12 @@ public class TranslationSetSubCommand extends SubCommand {
 	@Override
 	public int execute(ServerCommandSource source, String alias, String[] params) {
 		if (params.length<3) {
-			source.sendFeedback(DefaultTranslations.NEED_ARGUMENTS, false);
+			source.sendFeedback(DefaultTranslations.NEED_ARGUMENTS.translatableText(), false);
 			return 0;
 		}
 		TranslationProvider translationProvider = Loader.getProvider(TranslationProvider.class);
 		if (translationProvider==null) {
-			source.sendFeedback(DefaultTranslations.PROVIDER_NOT_FOUND, false);
+			source.sendFeedback(DefaultTranslations.PROVIDER_NOT_FOUND.translatableText(), false);
 			return 0;
 		}
 		final String old = translationProvider.getTranslation(params[0], params[1]);

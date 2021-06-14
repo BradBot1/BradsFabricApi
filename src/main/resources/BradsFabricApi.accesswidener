@@ -5,3 +5,8 @@ accessible field net/minecraft/network/packet/s2c/play/GameMessageS2CPacket mess
 accessible field net/minecraft/network/packet/s2c/play/GameMessageS2CPacket location Lnet/minecraft/network/MessageType;
 mutable field net/minecraft/network/packet/s2c/play/GameMessageS2CPacket message Lnet/minecraft/text/Text;
 mutable field net/minecraft/network/packet/s2c/play/GameMessageS2CPacket location Lnet/minecraft/network/MessageType;
+
+## Open up classes and methods for custom game rules
+accessible method net/minecraft/world/GameRules$Type <init> (Ljava/util/function/Supplier;Ljava/util/function/Function;Ljava/util/function/BiConsumer;Lnet/minecraft/world/GameRules$Acceptor;)V
+accessible class net/minecraft/world/GameRules$Acceptor
+accessible method net/minecraft/world/GameRules register (Ljava/lang/String;Lnet/minecraft/world/GameRules$Category;Lnet/minecraft/world/GameRules$Type;)Lnet/minecraft/world/GameRules$Key;

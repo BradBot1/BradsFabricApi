@@ -27,7 +27,7 @@ public class ConfigCheckSubCommand extends SubCommand {
 	@Override
 	public int execute(ServerCommandSource source, String alias, String[] params) {
 		if (params==null || params.length<1) {
-			source.sendFeedback(DefaultTranslations.NEED_ARGUMENTS, false);
+			source.sendFeedback(DefaultTranslations.NEED_ARGUMENTS.translatableText(), false);
 			return 0;
 		}
 		if (params.length>1) {

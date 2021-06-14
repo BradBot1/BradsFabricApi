@@ -1,13 +1,11 @@
 package com.bb1.api.translations;
 
-import com.bb1.api.Loader;
-
-import net.minecraft.text.TranslatableText;
+import java.util.HashMap;
 
 /**
  * Copyright 2021 BradBot_1
  * 
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License", new HashMap<String, String>());
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
 
@@ -23,28 +21,28 @@ public final class DefaultTranslations {
 	
 	// CONFIG
 	
-	public static final TranslatableText CONFIG_NOT_FOUND = Loader.getTranslatableText("config.not_found");
-	public static final TranslatableText CONFIG_PARSE_FAILED = Loader.getTranslatableText("config.parse_failed");
-	public static final TranslatableText CONFIG_WRITE_FAILED = Loader.getTranslatableText("config.write_failed");
-	public static final TranslatableText CONFIG_MODIFICATION_SUCCEEDED = Loader.getTranslatableText("config.modification_succeeded");
+	public static final Translation CONFIG_NOT_FOUND = new Translation("bfapi.config.not_found", new HashMap<String, String>());
+	public static final Translation CONFIG_PARSE_FAILED = new Translation("bfapi.config.parse_failed", new HashMap<String, String>());
+	public static final Translation CONFIG_WRITE_FAILED = new Translation("bfapi.config.write_failed", new HashMap<String, String>());
+	public static final Translation CONFIG_MODIFICATION_SUCCEEDED = new Translation("bfapi.config.modification_succeeded", new HashMap<String, String>());
 	/** When the config was modified but the write type and read type were not the same */
-	public static final TranslatableText CONFIG_MODIFICATION_SUCCEEDED_BUT_TYPES_DIFFERED = Loader.getTranslatableText("config.modification_succeeded_but_types_different");
+	public static final Translation CONFIG_MODIFICATION_SUCCEEDED_BUT_TYPES_DIFFERED = new Translation("bfapi.config.modification_succeeded_but_types_different", new HashMap<String, String>());
 	
 	// TRANSLATIONS
 	
-	public static final TranslatableText TRANSLATIONS_UPDATED = Loader.getTranslatableText("translation.updated");
-	public static final TranslatableText TRANSLATIONS_UPDATED_FAIL = Loader.getTranslatableText("translation.updated_failed");
+	public static final Translation TRANSLATIONS_UPDATED = new Translation("bfapi.translation.updated", new HashMap<String, String>());
+	public static final Translation TRANSLATIONS_UPDATED_FAIL = new Translation("bfapi.translation.updated_failed", new HashMap<String, String>());
 	
 	// GENERIC ERRORS
 	
-	public static final TranslatableText PLAYER_ONLY = Loader.getTranslatableText("error.player_only");
-	public static final TranslatableText CONSOLE_ONLY_COMMAND = Loader.getTranslatableText("error.console_only_command");
-	public static final TranslatableText PLAYER_ONLY_COMMAND = Loader.getTranslatableText("error.player_only_command");
-	public static final TranslatableText NEED_PERMISSIONS = Loader.getTranslatableText("error.required_permission");
+	public static final Translation PLAYER_ONLY = new Translation("bfapi.error.player_only", new HashMap<String, String>());
+	public static final Translation CONSOLE_ONLY_COMMAND = new Translation("bfapi.error.console_only_command", new HashMap<String, String>());
+	public static final Translation PLAYER_ONLY_COMMAND = new Translation("bfapi.error.player_only_command", new HashMap<String, String>());
+	public static final Translation NEED_PERMISSIONS = new Translation("bfapi.error.required_permission", new HashMap<String, String>());
 	/** When something is executed with improper arguments <i>(This includes if an argument is incorrect)</i>*/
-	public static final TranslatableText NEED_ARGUMENTS = Loader.getTranslatableText("error.required_arguments");
+	public static final Translation NEED_ARGUMENTS = new Translation("bfapi.error.required_arguments", new HashMap<String, String>());
 	/** When a provider is needed but not found/doesnt exist */
-	public static final TranslatableText PROVIDER_NOT_FOUND = Loader.getTranslatableText("error.required_provider");
+	public static final Translation PROVIDER_NOT_FOUND = new Translation("bfapi.error.required_provider", new HashMap<String, String>());
 	
 	private DefaultTranslations() { } // So no instance can be made of this class
 	

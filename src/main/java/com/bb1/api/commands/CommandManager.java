@@ -51,7 +51,11 @@ public final class CommandManager implements CommandProvider {
 	
 	private CommandManager() {
 		if (!Loader.CONFIG.loadCommandProvider) return;
-		Events.PROVIDER_INFO_EVENT.onEvent(new ProviderInformationEvent(this));
+		ProviderInformationEvent event = new ProviderInformationEvent(this);
+		Events.PROVIDER_INFO_EVENT.onEvent(event);
+		for (Command command : event.get(Command.class)) {
+			registerCommand(command);
+		}
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
 			for (RegisterableCommand registerableCommand : commands) {
 				final Command command = registerableCommand.getInner();

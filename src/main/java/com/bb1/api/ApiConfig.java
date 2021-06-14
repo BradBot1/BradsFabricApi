@@ -43,6 +43,10 @@ public class ApiConfig extends Config {
 	 * If the server has their own way to register commands they can disable the default one
 	 */
 	@Storable public boolean loadCommandProvider = true;
+	/**
+	 * If the server has another GameRule provider that ours conflicts with they can disable ours
+	 */
+	@Storable public boolean loadGameRuleProvider = true;
 	
 	// Toggling commands
 	
@@ -51,7 +55,9 @@ public class ApiConfig extends Config {
 	 */
 	@Storable public boolean loadTranslationCommand = true;
 	/**
-	 * If you do not wish for configs to be modifyable via a command you can disable this
+	 * If you do wish for configs to be modifyable via a command you can enable this
+	 * 
+	 * @apiNote This isn't the best system currently so avoid using it if possible
 	 */
-	@Storable public boolean loadConfigCommand = true;
+	@Storable public boolean loadConfigCommand = false;
 }

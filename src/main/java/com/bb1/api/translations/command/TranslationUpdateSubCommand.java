@@ -36,12 +36,12 @@ public class TranslationUpdateSubCommand extends SubCommand {
 	public int execute(ServerCommandSource source, String alias, String[] params) {
 		TranslationProvider translationProvider = Loader.getProvider(TranslationProvider.class);
 		if (translationProvider==null) {
-			source.sendFeedback(DefaultTranslations.PROVIDER_NOT_FOUND, false);
-			source.sendFeedback(DefaultTranslations.TRANSLATIONS_UPDATED_FAIL, true);
+			source.sendFeedback(DefaultTranslations.PROVIDER_NOT_FOUND.translatableText(), false);
+			source.sendFeedback(DefaultTranslations.TRANSLATIONS_UPDATED_FAIL.translatableText(), true);
 			return 0;
 		} else {
 			translationProvider.pushTranslations();
-			source.sendFeedback(DefaultTranslations.TRANSLATIONS_UPDATED, true);
+			source.sendFeedback(DefaultTranslations.TRANSLATIONS_UPDATED.translatableText(), true);
 			return 1;
 		}
 	}

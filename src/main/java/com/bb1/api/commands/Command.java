@@ -9,6 +9,7 @@ import com.bb1.api.commands.permissions.Permission;
 import com.bb1.api.commands.tab.ITabable;
 import com.bb1.api.events.Events;
 import com.bb1.api.providers.CommandProvider;
+import com.bb1.api.providers.PermissionProvider;
 
 /**
  * Copyright 2021 BradBot_1
@@ -70,7 +71,10 @@ public abstract class Command implements CommandHandler {
 	public void register() {
 		Events.PROVIDER_INFO_EVENT.register((event)->{
 			if(event.getProvider() instanceof CommandProvider) {
-				((CommandProvider)event.getProvider()).registerCommand(this);
+				event.give(this);
+			}
+			if (event.getProvider() instanceof PermissionProvider && getPermission()!=null) {
+				event.give(getPermission());
 			}
 		});
 	}

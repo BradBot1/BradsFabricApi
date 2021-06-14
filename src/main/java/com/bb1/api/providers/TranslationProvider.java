@@ -2,13 +2,13 @@ package com.bb1.api.providers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import com.bb1.api.translations.Translation;
 
 public abstract interface TranslationProvider extends Provider {
 	
-	public void registerTranslation(@NotNull String translation_key, @Nullable String defaultValue);
+	public void registerTranslation(@NotNull Translation translation);
 	
 	public void setTranslation(@NotNull String translation_key, @NotNull String lang, @NotNull String value);
 	

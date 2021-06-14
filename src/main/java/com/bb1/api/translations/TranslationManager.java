@@ -56,9 +56,7 @@ public final class TranslationManager implements TranslationProvider {
 	/**
 	 * Returns the {@link TranslationManager} instance
 	 */
-	public static TranslationManager get() {
-		return INSTANCE;
-	}
+	public static TranslationManager get() { return INSTANCE; }
 	/**
 	 * The language to register translations to if no translations are known
 	 */
@@ -72,7 +70,12 @@ public final class TranslationManager implements TranslationProvider {
 	
 	private TranslationManager() {
 		if (!Loader.CONFIG.loadTranslationProvider) return;
-		Events.LOAD_EVENT.register((event)->Events.PROVIDER_INFO_EVENT.onEvent(new ProviderInformationEvent(this)));
+		ProviderInformationEvent event = new ProviderInformationEvent(this);
+		Events.PROVIDER_INFO_EVENT.onEvent(event);
+		for (Translation translation : event.get(Translation.class)) {
+			registerTranslation(translation);
+		}
+		
 	}
 	/**
 	 * Converts the translation list to json
@@ -178,7 +181,12 @@ public final class TranslationManager implements TranslationProvider {
 	public String getProviderName() { return "TranslationManager"; }
 	
 	@Override
-	public void registerTranslation(String translation_key, String defaultValue) { setIfNotPresent(translation_key, DEFAULT_LANG, (defaultValue==null) ? translation_key : defaultValue); }
+	public void registerTranslation(Translation translation) {
+		for (Entry<String, String> entry : translation.translationMap().entrySet()) {
+			setIfNotPresent(translation.translation_key(), entry.getKey(), entry.getValue());
+		}
+		setIfNotPresent(translation.translation_key(), DEFAULT_LANG, translation.translation_key());
+	}
 	
 	@Override
 	public void setTranslation(String translation_key, String lang, String value) { setTranslation(translation_key, lang, value); }

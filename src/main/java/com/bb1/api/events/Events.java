@@ -1,5 +1,8 @@
 package com.bb1.api.events;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
@@ -175,9 +178,23 @@ public final class Events {
 		
 		private final Provider provider;
 		
+		private final List<Object> objects = new ArrayList<Object>();
+		
 		public ProviderInformationEvent(@NotNull Provider provider) { this.provider = provider; }
 		
 		public Provider getProvider() { return this.provider; }
+		
+		public void give(Object object) { this.objects.add(object); }
+		
+		public <T> Collection<T> get(Class<T> type) {
+			List<T> list = new ArrayList<T>();
+			for (Object object : objects) {
+				try {
+					list.add(type.cast(object));
+				} catch (Throwable t) {}
+			}
+			return list;
+		}
 		
 	}
 	

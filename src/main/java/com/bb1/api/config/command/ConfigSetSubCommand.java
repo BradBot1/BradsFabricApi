@@ -36,7 +36,7 @@ public class ConfigSetSubCommand extends SubCommand {
 	@Override
 	public int execute(ServerCommandSource source, String alias, String[] params) {
 		if (params==null || params.length<3) {
-			source.sendFeedback(DefaultTranslations.NEED_ARGUMENTS, false);
+			source.sendFeedback(DefaultTranslations.NEED_ARGUMENTS.translatableText(), false);
 			return 0;
 		}
 		final String configName = TabableConfigOptionList.fixName(params[0]);
@@ -50,7 +50,7 @@ public class ConfigSetSubCommand extends SubCommand {
 		boolean v = false;
 		File config = new File(Config.CONFIG_DIRECTORY+configName+".json");
 		if (config==null || !config.exists() || !config.isFile()) {
-			source.sendFeedback(DefaultTranslations.CONFIG_NOT_FOUND, false);
+			source.sendFeedback(DefaultTranslations.CONFIG_NOT_FOUND.translatableText(), false);
 			return 0;
 		}
 		JsonObject contents;
@@ -63,7 +63,7 @@ public class ConfigSetSubCommand extends SubCommand {
 			s.close();
 			contents = PARSER.parse(String.join("", r)).getAsJsonObject();
 		} catch (Throwable t) {
-			source.sendFeedback(DefaultTranslations.CONFIG_PARSE_FAILED, false);
+			source.sendFeedback(DefaultTranslations.CONFIG_PARSE_FAILED.translatableText(), false);
 			return 0;
 		}
 		JsonElement option = contents.get(optionName);
@@ -79,7 +79,7 @@ public class ConfigSetSubCommand extends SubCommand {
 					v = true;
 				}
 			} catch (Throwable t) {
-				source.sendFeedback(DefaultTranslations.NEED_ARGUMENTS, false);
+				source.sendFeedback(DefaultTranslations.NEED_ARGUMENTS.translatableText(), false);
 				return 0;
 			}
 		}
@@ -89,13 +89,13 @@ public class ConfigSetSubCommand extends SubCommand {
 			b.flush();
 			b.close();
 		} catch (Throwable t) {
-			source.sendFeedback(DefaultTranslations.CONFIG_WRITE_FAILED, false);
+			source.sendFeedback(DefaultTranslations.CONFIG_WRITE_FAILED.translatableText(), false);
 			return 0;
 		}
 		if (v) {
-			source.sendFeedback(DefaultTranslations.CONFIG_MODIFICATION_SUCCEEDED_BUT_TYPES_DIFFERED, false);
+			source.sendFeedback(DefaultTranslations.CONFIG_MODIFICATION_SUCCEEDED_BUT_TYPES_DIFFERED.translatableText(), false);
 		} else {
-			source.sendFeedback(DefaultTranslations.CONFIG_MODIFICATION_SUCCEEDED, false);
+			source.sendFeedback(DefaultTranslations.CONFIG_MODIFICATION_SUCCEEDED.translatableText(), false);
 		}
 		Events.CONFIG_EVENT.onEvent(new ConfigChangeEvent(configName, ConfigChangeType.REFRESH));
 		return 1;
