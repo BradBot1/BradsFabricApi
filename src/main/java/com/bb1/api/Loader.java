@@ -22,7 +22,7 @@ import com.bb1.api.translations.DefaultTranslations;
 import com.bb1.api.translations.TranslationManager;
 import com.bb1.api.translations.command.TranslationCommand;
 
-import net.fabricmc.api.DedicatedServerModInitializer;
+import net.fabricmc.api.ModInitializer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -43,7 +43,7 @@ import net.minecraft.text.TranslatableText;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class Loader implements DedicatedServerModInitializer {
+public class Loader implements ModInitializer {
 	/**
 	 * Formats a {@link TranslatableText} in the format "bradsfabricapi." + <i>key</i>;
 	 * 
@@ -102,7 +102,7 @@ public class Loader implements DedicatedServerModInitializer {
 	public static final ApiConfig CONFIG = new ApiConfig();
 	
 	@Override
-	public void onInitializeServer() {
+	public void onInitialize() {
 		CONFIG.load();
 		if (CONFIG.debugMode) {
 			LOGGER.log(Level.WARN, " ");
