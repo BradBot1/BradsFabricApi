@@ -14,9 +14,7 @@ To handle the event you would just have to register a listener like so:
 
 ```java
 StringEvent.register((event)->{
-	
-	// Handle event here
-	
+	// Handle event
 });
 ```
 
@@ -27,10 +25,3 @@ Finally, you can call you event by using its onEvent(E event) method *(or you ca
 ```java
 StringEvent.onEvent("hello!");
 ```
-
-# Handling events
-
-### EventHandlers
-
-Events handlers are interfaces that handle specified events, these are [registered](#registering-a-handler-to-the-event) to be invoked when the event is called
-

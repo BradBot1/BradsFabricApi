@@ -10,10 +10,12 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.bb1.api.commands.Command;
 import com.bb1.api.commands.CommandManager;
 import com.bb1.api.config.command.ConfigCommand;
 import com.bb1.api.events.Events;
 import com.bb1.api.events.Events.ProviderRegistrationEvent;
+import com.bb1.api.gamerules.GameRule;
 import com.bb1.api.gamerules.GameRuleManager;
 import com.bb1.api.gamerules.StringGameRule;
 import com.bb1.api.permissions.PermissionManager;
@@ -30,6 +32,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.GameRules.Category;
 /**
@@ -96,6 +99,7 @@ public class Loader implements ModInitializer {
 		return path.endsWith("/") ? path.substring(0, path.length()-10) : path.substring(0, path.length()-9);
 	}
 	
+	@Nullable
 	public static ServerPlayerEntity getServerPlayerEntity(ServerCommandSource source) {
 		try {
 			return source.getPlayer();
@@ -108,7 +112,18 @@ public class Loader implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		
-		new StringGameRule("testGameRule", "owo", Category.MISC).register();
+		GameRule<?> gamerule = new StringGameRule("testGameRule", "owo", Category.MISC);
+		gamerule.register();
+		
+		new Command("test") {
+			
+			@Override
+			public int execute(ServerCommandSource source, String alias, String[] params) {
+				source.sendFeedback(new LiteralText(gamerule.toString()), false);
+				return 0;
+			}
+			
+		}.register();
 		
 		CONFIG.load();
 		if (CONFIG.debugMode) {

@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.bb1.api.commands.permissions.Permission;
 import com.bb1.api.commands.tab.ITabable;
+import com.bb1.api.commands.tab.TabableSubCommand;
 import com.bb1.api.events.Events;
 import com.bb1.api.providers.CommandProvider;
 import com.bb1.api.providers.PermissionProvider;
@@ -74,7 +75,22 @@ public abstract class Command implements CommandHandler {
 				event.give(this);
 			}
 			if (event.getProvider() instanceof PermissionProvider && getPermission()!=null) {
-				event.give(getPermission());
+				Permission permission = getPermission();
+				if (permission!=null) { event.give(permission); }
+				ITabable[] tabs = getParams();
+				if (tabs!=null && tabs.length>0) {
+					for (ITabable tab : tabs) {
+						if (tab==null || !(tab instanceof TabableSubCommand)) continue;
+						SubCommand[] subs = ((TabableSubCommand)tab).getSubCommands();
+						if (subs!=null && subs.length>0) {
+							for (SubCommand sub : subs) {
+								Permission subPermission = sub.getPermission();
+								if (subPermission!=null) { event.give(subPermission); }
+							}
+						}
+						break;
+					}
+				}
 			}
 		});
 	}

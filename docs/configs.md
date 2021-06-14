@@ -98,4 +98,4 @@ If you attempt to save a value that is not one of the following:
 * char
 * any form of JsonElement
 
-You will end up with an IllegalArgumentException thrown
+You will end up with an IllegalArgumentException

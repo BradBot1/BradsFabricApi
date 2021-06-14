@@ -9,7 +9,7 @@ public class StringGameRule extends GameRule<String> {
 	public StringGameRule(@NotNull String name, String value, Category category) { super(name, value, category); }
 
 	@Override
-	public String serialize() { return value; }
+	public String serialize() { return toString(); }
 
 	@Override
 	public void deserialize(String serializedData) { setValue(serializedData); }
@@ -18,6 +18,6 @@ public class StringGameRule extends GameRule<String> {
 	public String parse(String string) { return string; }
 	
 	@Override
-	public String toString() { return value; }
+	public String toString() { return getValue(); }
 
 }
