@@ -7,7 +7,8 @@
   	"MinecraftServerMixin",
   	"ChatMixin",
   	"ReloadMixin",
-  	"PlayerNBTMixin"
+  	"PlayerNBTMixin",
+  	"CommandMangerMixin"
   ],
   "client": [],
   "injectors": {

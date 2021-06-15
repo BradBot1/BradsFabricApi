@@ -10,14 +10,11 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.bb1.api.commands.Command;
 import com.bb1.api.commands.CommandManager;
 import com.bb1.api.config.command.ConfigCommand;
 import com.bb1.api.events.Events;
 import com.bb1.api.events.Events.ProviderRegistrationEvent;
-import com.bb1.api.gamerules.GameRule;
 import com.bb1.api.gamerules.GameRuleManager;
-import com.bb1.api.gamerules.StringGameRule;
 import com.bb1.api.permissions.PermissionManager;
 import com.bb1.api.providers.PermissionProvider;
 import com.bb1.api.providers.Provider;
@@ -32,9 +29,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.world.GameRules.Category;
 /**
  * Copyright 2021 BradBot_1
  * 
@@ -60,15 +55,21 @@ public class Loader implements ModInitializer {
 		return new TranslatableText("bfapi."+key);
 	}
 	
+	// Minecraft Server
+	
 	private static MinecraftServer minecraftServer;
 	
-	public static void setMinecraftServer(MinecraftServer server) {
-		minecraftServer = server;
-	}
+	public static void setMinecraftServer(MinecraftServer server) { minecraftServer = server; }
 	
-	public static MinecraftServer getMinecraftServer() {
-		return minecraftServer;
-	}
+	public static MinecraftServer getMinecraftServer() { return minecraftServer; }
+	
+	// CommandManager
+	
+	private static net.minecraft.server.command.CommandManager commandManager;
+	
+	public static void setCommandManager(net.minecraft.server.command.CommandManager commandManager2) { commandManager = commandManager2; }
+	
+	public static net.minecraft.server.command.CommandManager getCommandManager() { return commandManager; }
 	
 	private static final Set<Provider> PROVIDERS = new HashSet<Provider>();
 	
@@ -111,20 +112,6 @@ public class Loader implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
-		
-		GameRule<?> gamerule = new StringGameRule("testGameRule", "owo", Category.MISC);
-		gamerule.register();
-		
-		new Command("test") {
-			
-			@Override
-			public int execute(ServerCommandSource source, String alias, String[] params) {
-				source.sendFeedback(new LiteralText(gamerule.toString()), false);
-				return 0;
-			}
-			
-		}.register();
-		
 		CONFIG.load();
 		if (CONFIG.debugMode) {
 			LOGGER.log(Level.WARN, " ");

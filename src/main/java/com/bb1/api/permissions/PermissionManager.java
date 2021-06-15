@@ -200,7 +200,10 @@ public final class PermissionManager implements PermissionProvider {
 					public boolean test(ServerCommandSource t) {
 						ServerPlayerEntity player = Loader.getServerPlayerEntity(t);
 						Permission permission = permissions.get(getPerm(node));
-						if (permission.opLevel()==-3 || player==null) return old.test(t);
+						CommandProvider commandProvider = Loader.getProvider(CommandProvider.class);
+						if (player==null) return old.test(t);
+						if (commandProvider!=null && !commandProvider.isCommandEnabled(player, node.getName())) return false;
+						if (permission.opLevel()==-3) return old.test(t);
 						boolean b = hasPermission(player, getPerm(node));
 						if (debug && !b) getProviderLogger().info("Hid the command "+node.getName()+" from the player "+player.getName().asTruncatedString(32)+" due to the missing permission "+permission.permission());
 						return b;

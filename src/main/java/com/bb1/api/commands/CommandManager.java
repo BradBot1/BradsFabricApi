@@ -1,9 +1,12 @@
 package com.bb1.api.commands;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +21,9 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
@@ -158,5 +163,26 @@ public final class CommandManager implements CommandProvider {
 
 	@Override
 	public @NotNull String getProviderName() { return "CommandManager"; }
+	
+	private Map<UUID, Set<String>> blockedMap = new HashMap<UUID, Set<String>>();
+	
+	@Override
+	public void disableCommand(PlayerEntity player, String commandName) {
+		Set<String> set = blockedMap.getOrDefault(player.getUuid(), new HashSet<String>());
+		set.add(commandName);
+		blockedMap.put(player.getUuid(), set);
+		if (player instanceof ServerPlayerEntity server) { Loader.getCommandManager().sendCommandTree(server); }
+	}
+
+	@Override
+	public void enableCommand(PlayerEntity player, String commandName) {
+		Set<String> set = blockedMap.getOrDefault(player.getUuid(), new HashSet<String>());
+		set.remove(commandName);
+		blockedMap.put(player.getUuid(), set);
+		if (player instanceof ServerPlayerEntity server) { Loader.getCommandManager().sendCommandTree(server); }
+	}
+
+	@Override
+	public boolean isCommandEnabled(PlayerEntity player, String commandName) { return !blockedMap.getOrDefault(player.getUuid(), new HashSet<String>()).contains(commandName); }
 	
 }

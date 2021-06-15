@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Nullable;
 
 import com.bb1.api.commands.Command;
 
+import net.minecraft.entity.player.PlayerEntity;
+
 /**
  * Copyright 2021 BradBot_1
  * 
@@ -31,5 +33,11 @@ public interface CommandProvider extends Provider {
 	
 	@Override
 	public default Logger getProviderLogger() { return LogManager.getLogger("CommandProvider | "+getProviderName()); }
+	
+	public void disableCommand(PlayerEntity player, String commandName);
+	
+	public void enableCommand(PlayerEntity player, String commandName);
+	
+	public boolean isCommandEnabled(PlayerEntity player, String commandName);
 	
 }
