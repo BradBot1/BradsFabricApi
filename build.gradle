@@ -51,6 +51,9 @@ tasks.withType(JavaCompile).configureEach {
 	// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 	// If Javadoc is generated, this must be specified in that task too.
 	it.options.encoding = "UTF-8"
+	
+	// My compiler moans without this
+	// it.options.compilerArgs.add('--enable-preview')
 }
 
 java {

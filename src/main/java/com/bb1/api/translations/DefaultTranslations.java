@@ -41,7 +41,7 @@ public final class DefaultTranslations {
 	public static final Translation NEED_PERMISSIONS = new Translation("bfapi.error.required_permission", new HashMap<String, String>());
 	/** When something is executed with improper arguments <i>(This includes if an argument is incorrect)</i>*/
 	public static final Translation NEED_ARGUMENTS = new Translation("bfapi.error.required_arguments", new HashMap<String, String>());
-	/** When a provider is needed but not found/doesnt exist */
+	/** When a provider is needed but not found/doesn't exist */
 	public static final Translation PROVIDER_NOT_FOUND = new Translation("bfapi.error.required_provider", new HashMap<String, String>());
 	
 	private DefaultTranslations() { } // So no instance can be made of this class
