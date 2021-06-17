@@ -17,7 +17,6 @@ import com.bb1.api.commands.permissions.Permission;
 import com.bb1.api.commands.tab.ITabable;
 import com.bb1.api.commands.tab.TabableSubCommand;
 import com.bb1.api.events.Events;
-import com.bb1.api.events.Events.ProviderInformationEvent;
 import com.bb1.api.providers.CommandProvider;
 import com.bb1.api.providers.PermissionProvider;
 import com.mojang.brigadier.CommandDispatcher;
@@ -63,7 +62,11 @@ public final class PermissionManager implements PermissionProvider {
 	private PermissionManager() {
 		if (!Loader.CONFIG.loadPermissionProvider) return;
 		Events.RELOAD_EVENT.register(event->overrideCommands());
-		Events.LOAD_EVENT.register((event)->Events.PROVIDER_INFO_EVENT.onEvent(new ProviderInformationEvent(this)));
+		Events.LOAD_EVENT.register((event)->{
+			for (Permission perm : callInfoEventAndGet(Permission.class)) {
+				registerPermission(perm);
+			}
+		});
 		if (loader.isModLoaded("fabric-permissions-api-v0")) {
 			PermissionCheckEvent.EVENT.register(new PermissionCheckEvent() {
 				

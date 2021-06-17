@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import com.bb1.api.Loader;
 import com.bb1.api.commands.tab.ITabable;
 import com.bb1.api.events.Events;
-import com.bb1.api.events.Events.ProviderInformationEvent;
 import com.bb1.api.providers.CommandProvider;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -56,11 +55,11 @@ public final class CommandManager implements CommandProvider {
 	
 	private CommandManager() {
 		if (!Loader.CONFIG.loadCommandProvider) return;
-		ProviderInformationEvent event = new ProviderInformationEvent(this);
-		Events.PROVIDER_INFO_EVENT.onEvent(event);
-		for (Command command : event.get(Command.class)) {
-			registerCommand(command);
-		}
+		Events.LOAD_EVENT.register((event)->{
+			for (Command command : callInfoEventAndGet(Command.class)) {
+				registerCommand(command);
+			}
+		});
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
 			for (RegisterableCommand registerableCommand : commands) {
 				final Command command = registerableCommand.getInner();

@@ -26,6 +26,16 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class Translation {
 
+	public static Translation createGenericEnglishTranslation(@NotNull String translation_key, @NotNull String englishTranslation) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("en_us", englishTranslation);
+		map.put("en_gb", englishTranslation);
+		map.put("en_au", englishTranslation);
+		map.put("en_ca", englishTranslation);
+		map.put("en_nz", englishTranslation);
+		return new Translation(translation_key, map);
+	}
+
 	private final String translation_key;
 
 	private final Map<String, String> translationMap;

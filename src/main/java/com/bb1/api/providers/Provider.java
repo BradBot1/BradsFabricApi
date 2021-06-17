@@ -1,9 +1,13 @@
 package com.bb1.api.providers;
 
+import java.util.Collection;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.jetbrains.annotations.NotNull;
+
+import com.bb1.api.events.Events;
+import com.bb1.api.events.Events.ProviderInformationEvent;
 
 /**
  * Copyright 2021 BradBot_1
@@ -43,4 +47,11 @@ public interface Provider {
 	public default void load() { }
 	
 	public default Logger getProviderLogger() { return LogManager.getLogger("Provider | "+getProviderName()); }
+	
+	public default <T> Collection<T> callInfoEventAndGet(Class<T> objectsType) {
+		ProviderInformationEvent event = new ProviderInformationEvent(this);
+		Events.PROVIDER_INFO_EVENT.onEvent(event);
+		return event.get(objectsType);
+	}
+	
 }

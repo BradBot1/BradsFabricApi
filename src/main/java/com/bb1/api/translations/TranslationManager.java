@@ -12,11 +12,13 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import com.mojang.authlib.GameProfile;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import com.bb1.api.Loader;
 import com.bb1.api.events.Events;
-import com.bb1.api.events.Events.ProviderInformationEvent;
 import com.bb1.api.providers.TranslationProvider;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -69,12 +71,12 @@ public final class TranslationManager implements TranslationProvider {
 	
 	private TranslationManager() {
 		if (!Loader.CONFIG.loadTranslationProvider) return;
-		ProviderInformationEvent event = new ProviderInformationEvent(this);
-		Events.PROVIDER_INFO_EVENT.onEvent(event);
-		for (Translation translation : event.get(Translation.class)) {
-			registerTranslation(translation);
-		}
-		
+		Events.LOAD_EVENT.register((event)->{
+			for (Translation translation : callInfoEventAndGet(Translation.class)) {
+				registerTranslation(translation);
+			}
+			pushTranslations();
+		});
 	}
 	/**
 	 * Converts the translation list to json

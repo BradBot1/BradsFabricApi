@@ -2,7 +2,6 @@ package com.bb1.api.gamerules;
 
 import com.bb1.api.Loader;
 import com.bb1.api.events.Events;
-import com.bb1.api.events.Events.ProviderInformationEvent;
 import com.bb1.api.providers.GameRuleProvider;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -35,11 +34,11 @@ public final class GameRuleManager implements GameRuleProvider {
 	
 	private GameRuleManager() {
 		if (!Loader.CONFIG.loadGameRuleProvider) return;
-		ProviderInformationEvent event = new ProviderInformationEvent(this);
-		Events.PROVIDER_INFO_EVENT.onEvent(event);
-		for (GameRule<?> gameRule : event.get(GameRule.class)) {
-			register(gameRule);
-		}
+		Events.LOAD_EVENT.register((event)->{
+			for (GameRule<?> gameRule : callInfoEventAndGet(GameRule.class)) {
+				register(gameRule);
+			}
+		});
 	}
 	
 	private boolean debug = Loader.CONFIG.debugMode;

@@ -60,4 +60,7 @@ public class ApiConfig extends Config {
 	 * @apiNote This isn't the best system currently so avoid using it if possible
 	 */
 	@Storable public boolean loadConfigCommand = false;
+
+	@Override
+	public boolean throwAndHandleEvents() { return false; }
 }

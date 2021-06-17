@@ -8,6 +8,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import com.bb1.api.Loader;
@@ -51,7 +53,7 @@ public abstract class Config {
 	/** Names cannot contain extensions, for example exampleConfig.yml is not a valid config name */
 	@NotNull private final String name;
 	
-	protected Config(String name) {
+	protected Config(@NotNull String name) {
 		this.name = name;
 		if (throwAndHandleEvents()) { // We should handle events
 			Events.CONFIG_EVENT.register((event) -> {
@@ -73,7 +75,7 @@ public abstract class Config {
 	 * This defines what the config should be saved as
 	 */
 	@NotNull
-	public final String getConfigName() { return this.name.replaceAll("[\\.]\\w+", ""); }
+	public final String getConfigName() { return (name==null) ? getClass().getName() : name; }
 	/**
 	 * If the config should through {@link ConfigChangeEvent}'s
 	 * 
@@ -88,12 +90,17 @@ public abstract class Config {
 	public void refresh() {
 		if (throwAndHandleEvents()) Events.CONFIG_EVENT.onEvent(new ConfigChangeEvent(this, ConfigChangeType.REFRESH));
 	}
+
+	private Logger getLogger() {
+		return LogManager.getLogger("Config | "+getConfigName());
+	}
 	
 	public void load() {
+		Logger logger = getLogger();
 		new File(CONFIG_DIRECTORY).mkdirs();
 		File file = new File(CONFIG_DIRECTORY+getConfigName()+".json");
 		if (!file.exists()) return; // Can't load anything if there is file
-		ArrayList<String> r = new ArrayList<>();
+		ArrayList<String> r = new ArrayList<String>();
 		try {
 			// Attempt to read the config's contents
 			Scanner s = new Scanner(file);
@@ -102,12 +109,12 @@ public abstract class Config {
 			}
 			s.close();
 		} catch (IOException e) {
-			System.err.println("Failed to load config due to an IOException");
+			logger.error("Failed to load config due to an IOException");
 			return; // Not readable
 		}
 		JsonElement contents = PARSER.parse(String.join("", r));
 		if (!contents.isJsonObject()) {
-			System.err.println("Failed to load config due to the contents not being a JsonObject");
+			logger.error("Failed to load config due to the contents not being a JsonObject");
 			return;
 		}
 		JsonObject jsonObject = contents.getAsJsonObject();
@@ -157,13 +164,17 @@ public abstract class Config {
 	}
 	
 	public void save() {
+		Logger logger = getLogger();
 		JsonObject jsonObject = new JsonObject();
 		for (Field field : getClass().getFields()) { // Go through every field in the config
 			if (field.isEnumConstant()) continue; // Do not work on constants or inaccessable values
 			Storable storable = field.getAnnotation(Storable.class); // Get its storable instance
 			if (storable!=null) { // If the instance is not null
 				final String saveUnder = storable.key().equalsIgnoreCase("null") ? field.getName() : storable.key();
-				if (jsonObject.has(saveUnder)) throw new IllegalArgumentException("The field "+field.getName()+"("+saveUnder+") in the config "+getClass().getName()+"("+getConfigName()+".json) is trying to save under a key already used!");
+				if (jsonObject.has(saveUnder)) {
+					logger.error("The field "+field.getName()+"("+saveUnder+") in the config "+getClass().getName()+"("+getConfigName()+".json) is trying to save under a key already used!");
+					continue;
+				}
 				Object value;
 				try {
 					@SuppressWarnings("deprecation")
@@ -187,7 +198,8 @@ public abstract class Config {
 				} else if(value instanceof Boolean) {
 					jsonElement = new JsonPrimitive((Boolean) value);
 				} else {
-					throw new IllegalArgumentException("The field "+field.getName()+"("+saveUnder+") in the config "+getClass().getName()+"("+getConfigName()+".json) is not savable!");
+					logger.error("The field "+field.getName()+"("+saveUnder+") in the config "+getClass().getName()+"("+getConfigName()+".json) is not savable!");
+					continue;
 				}
 				jsonObject.add(saveUnder, jsonElement);
 			}
@@ -202,9 +214,10 @@ public abstract class Config {
 			b.write(GSON.toJson(jsonObject));
 			b.flush();
 			b.close();
+			logger.info("Saved "+getConfigName());
 			if (throwAndHandleEvents()) Events.CONFIG_EVENT.onEvent(new ConfigChangeEvent(this, ConfigChangeType.SAVE));
 		} catch (IOException e) {
-			// TODO: log error
+			logger.info("Failed to save "+getConfigName());
 		}
 	}
 	
