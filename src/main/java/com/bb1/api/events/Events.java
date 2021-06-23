@@ -1,14 +1,9 @@
 package com.bb1.api.events;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import com.bb1.api.providers.Provider;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -131,36 +126,8 @@ public final class Events {
 	}
 	/** Events specifically tied to the API */
 	public static class APIEvents {
-		/** Called when a provider registers itself */
-		public static final Event<Provider> PROVIDER_REGISTRATION_EVENT = new Event<Provider>();
-		/** Called when a provider requests information<br><i>(like when the permission provider wants permissions)</i> */
-		public static final Event<ProviderInformationEvent> PROVIDER_INFO_EVENT = new Event<ProviderInformationEvent>();
 		
 		private APIEvents() { }
-		
-		public static class ProviderInformationEvent {
-			
-			private final Provider provider;
-			
-			private final List<Object> objects = new ArrayList<Object>();
-			
-			public ProviderInformationEvent(@NotNull Provider provider) { this.provider = provider; }
-			
-			public Provider getProvider() { return this.provider; }
-			
-			public void give(Object object) { this.objects.add(object); }
-			
-			public <T> Collection<T> get(Class<T> type) {
-				List<T> list = new ArrayList<T>();
-				for (Object object : objects) {
-					try {
-						list.add(type.cast(object));
-					} catch (Throwable t) {}
-				}
-				return list;
-			}
-			
-		}
 		
 	}
 
