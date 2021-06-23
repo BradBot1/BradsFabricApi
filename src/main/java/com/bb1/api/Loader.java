@@ -3,11 +3,11 @@ package com.bb1.api;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
+import com.bb1.api.commands.BFAPICommandProvider;
 import com.bb1.api.datapacks.BFAPIDatapackProvider;
 import com.bb1.api.events.Events;
 import com.bb1.api.gamerules.BFAPIGameRuleProvider;
@@ -97,13 +97,13 @@ public class Loader implements ModInitializer {
 	public void onInitialize() {
 		CONFIG.load();
 		if (CONFIG.debugMode) {
-			LOGGER.log(Level.WARN, " ");
-			LOGGER.log(Level.WARN, " ");
-			LOGGER.log(Level.WARN, " ");
-			LOGGER.log(Level.WARN, "Debug mode is enabled, it is recommended that you disable debug mode unless it is needed to remove console clutter");
-			LOGGER.log(Level.WARN, " ");
-			LOGGER.log(Level.WARN, " ");
-			LOGGER.log(Level.WARN, " ");
+			LOGGER.warn(" ");
+			LOGGER.warn(" ");
+			LOGGER.warn(" ");
+			LOGGER.warn("Debug mode is enabled, it is recommended that you disable debug mode unless it is needed to remove console clutter");
+			LOGGER.warn(" ");
+			LOGGER.warn(" ");
+			LOGGER.warn(" ");
 		}
 		Events.GameEvents.STOP_EVENT.register((e)->CONFIG.save());
 		// Permissions
@@ -118,6 +118,8 @@ public class Loader implements ModInitializer {
 		new BFAPIDatapackProvider();
 		// Text
 		new BoxOfPlaceholders();
+		// Command
+		new BFAPICommandProvider();
 	}
 	
 }

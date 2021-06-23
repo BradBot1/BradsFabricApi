@@ -31,4 +31,7 @@ public class TextManager extends AbstractManager<TextProvider> {
 		return text2;
 	}
 
+	@Override
+	protected void onRegister(TextProvider provider) { }
+
 }

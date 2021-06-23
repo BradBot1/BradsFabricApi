@@ -1,11 +1,8 @@
 package com.bb1.api.datapacks;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.bb1.api.managers.AbstractInputtableManager;
 
-import com.bb1.api.managers.AbstractManager;
-
-public class DatapackManager extends AbstractManager<DatapackProvider> {
+public class DatapackManager extends AbstractInputtableManager<DatapackProvider, DatapackHandler> {
 
 	private static final DatapackManager INSTANCE = new DatapackManager();
 	
@@ -13,21 +10,18 @@ public class DatapackManager extends AbstractManager<DatapackProvider> {
 	
 	private DatapackManager() { }
 	
-	private Set<DatapackHandler> datapacks = new HashSet<DatapackHandler>();
-	
-	public void registerHandler(DatapackHandler datapackHandler) {
-		this.datapacks.add(datapackHandler);
+	@Override
+	protected void onInput(DatapackHandler input) {
 		for (DatapackProvider datapackProvider : getProviders()) {
-			datapackProvider.registerHandler(datapackHandler);
+			datapackProvider.registerHandler(input);
 		}
 	}
 	
 	@Override
-	public void registerProvider(DatapackProvider provider) {
-		for (DatapackHandler datapackHandler : this.datapacks) {
+	protected void onRegister(DatapackProvider provider) {
+		for (DatapackHandler datapackHandler : getInput()) {
 			provider.registerHandler(datapackHandler);
 		}
-		super.registerProvider(provider);
 	}
 
 }

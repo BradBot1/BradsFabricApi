@@ -1,11 +1,8 @@
 package com.bb1.api.gamerules;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.bb1.api.managers.AbstractInputtableManager;
 
-import com.bb1.api.managers.AbstractManager;
-
-public class GameRuleManager extends AbstractManager<GameRuleProvider> {
+public class GameRuleManager extends AbstractInputtableManager<GameRuleProvider, GameRule<?>> {
 	
 	private static final GameRuleManager INSTANCE = new GameRuleManager();
 	
@@ -13,21 +10,18 @@ public class GameRuleManager extends AbstractManager<GameRuleProvider> {
 	
 	private GameRuleManager() { }
 	
-	private Set<GameRule<?>> gameRules = new HashSet<GameRule<?>>();
-	
-	public void registerGameRule(GameRule<?> gameRule) {
-		gameRules.add(gameRule);
-		for (GameRuleProvider provider : getProviders()) {
+	@Override
+	protected void onRegister(GameRuleProvider provider) {
+		for (GameRule<?> gameRule : getInput()) {
 			provider.registerGameRule(gameRule);
 		}
 	}
 	
 	@Override
-	public void registerProvider(GameRuleProvider provider) {
-		for (GameRule<?> gameRule : gameRules) {
-			provider.registerGameRule(gameRule);
+	protected void onInput(GameRule<?> input) {
+		for (GameRuleProvider provider : getProviders()) {
+			provider.registerGameRule(input);
 		}
-		super.registerProvider(provider);
 	}
 	
 }

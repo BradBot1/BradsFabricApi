@@ -1,11 +1,8 @@
 package com.bb1.api.translations;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.bb1.api.managers.AbstractInputtableManager;
 
-import com.bb1.api.managers.AbstractManager;
-
-public class TranslationManager extends AbstractManager<TranslationProvider> {
+public class TranslationManager extends AbstractInputtableManager<TranslationProvider, Translation> {
 	
 	private static final TranslationManager INSTANCE = new TranslationManager();
 	
@@ -13,21 +10,18 @@ public class TranslationManager extends AbstractManager<TranslationProvider> {
 	
 	private TranslationManager() { }
 	
-	private Set<Translation> translations = new HashSet<Translation>();
-	
-	public void registerTranslation(Translation translation) {
-		translations.add(translation);
-		for (TranslationProvider provider : getProviders()) {
+	@Override
+	protected void onRegister(TranslationProvider provider) {
+		for (Translation translation : getInput()) {
 			provider.registerTranslation(translation);
 		}
 	}
 	
 	@Override
-	public void registerProvider(TranslationProvider provider) {
-		for (Translation translation : translations) {
-			provider.registerTranslation(translation);
+	protected void onInput(Translation input) {
+		for (TranslationProvider provider : getProviders()) {
+			provider.registerTranslation(input);
 		}
-		super.registerProvider(provider);
 	}
 	
 }

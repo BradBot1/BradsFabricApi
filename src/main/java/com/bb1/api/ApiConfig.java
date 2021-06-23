@@ -2,6 +2,7 @@ package com.bb1.api;
 
 import com.bb1.api.config.Config;
 import com.bb1.api.config.Storable;
+import com.google.gson.JsonArray;
 
 /**
  * Copyright 2021 BradBot_1
@@ -28,5 +29,7 @@ public class ApiConfig extends Config {
 	}
 	
 	@Storable public boolean debugMode = false;
+	
+	@Storable public JsonArray blockedProviders = new JsonArray();
 	
 }
