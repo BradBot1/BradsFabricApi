@@ -39,7 +39,7 @@ public class BFAPICommandProvider implements CommandProvider {
 					public boolean test(ServerCommandSource t) {
 						ServerPlayerEntity player = Loader.getServerPlayerEntity(t);
 						if (player==null) return old.test(t);
-						return canSee(player, node.getName());
+						return (canSee(player, node.getName())) ? old.test(t) : false;
 					}
 					
 				});
