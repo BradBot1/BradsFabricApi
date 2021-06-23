@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.bb1.api.mixins",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+  	"MinecraftServerMixin",
+  	"ChatMixin",
+  	"ReloadMixin",
+  	"PlayerNBTMixin",
+  	"CommandMangerMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

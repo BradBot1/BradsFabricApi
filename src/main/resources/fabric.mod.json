@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "bfapi",
+  "version": "${version}",
+
+  "name": "BFAPI",
+  "description": "A serverside mod to make the creation of other server side mods easier",
+  "authors": [
+    "BradBot_1"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+
+  "license": "Apache License v2",
+  "icon": "assets/BradsFabricApi/icon.png",
+
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "com.bb1.api.Loader"
+    ]
+  },
+  "mixins": [
+    "modid.mixins.json"
+  ],
+  
+  "accessWidener" : "BradsFabricApi.accesswidener",
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.17.x"
+  },
+  "suggests": {}
+}
