@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+
+  "name": "${name}",
+  "description": "A funky template mod",
+  "authors": [
+    "BradBot_1"
+  ],
+  "contact": {
+    "homepage": "https://github.com/BradBot1",
+    "sources": "https://github.com/BradBot1/Fabric-Template",
+    "issues": "https://github.com/BradBot1/Fabric-Template/issues"
+  },
+
+  "license": "Apache License v2",
+  "icon": "assets/${id}/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "${path}.${id}.Loader"
+    ]
+  },
+  "mixins": [
+    "${id}.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  },
+  "suggests": {}
+}
