@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.bb1.fabric.bfapi.Constants;
-import com.bb1.fabric.bfapi.Loader;
 import com.bb1.fabric.bfapi.permissions.Permission;
 import com.bb1.fabric.bfapi.permissions.PermissionLevel;
 import com.bb1.fabric.bfapi.registery.BFAPIRegistry;
@@ -48,7 +47,7 @@ public class Config {
 	
 	private static boolean LOADED = false;
 	
-	public static synchronized final void init(@NotNull Loader loader) {
+	public static synchronized final void init() {
 		if (LOADED) { return; }
 		// api stuff
 		new InlineConfigSerializer<Permission>(ID, Permission.class, (n)->{
@@ -79,7 +78,7 @@ public class Config {
 	
 	@SuppressWarnings("unchecked")
 	public static <T> @Nullable AbstractConfigSerializable<T> getSerializer(Class<T> wantedClazz, boolean allowSupers) {
-		switch (wantedClazz.getName()) { // since we know these values we may aswell switch over them for a little bit of performance
+		switch (wantedClazz.getName()) { // since we know these values we may aswell switch over them for a little bit of performance (it also allows for primitives lol)
 			case "int":
 			case "java.lang.Integer":
 			case "short":
@@ -92,15 +91,15 @@ public class Config {
 			case "java.lang.Float":
 			case "byte":
 			case "java.lang.Byte":
-				return  (AbstractConfigSerializable<T>) BFAPIRegistry.CONFIG_SERIALIZER.get(new Identifier(ID, "number_serializer"));
+				return  (AbstractConfigSerializable<T>) BFAPIRegistry.CONFIG_SERIALIZER.get(new Identifier("java:number_serializer"));
 			case "String":
-				return  (AbstractConfigSerializable<T>) BFAPIRegistry.CONFIG_SERIALIZER.get(new Identifier(ID, "string_serializer"));
+				return  (AbstractConfigSerializable<T>) BFAPIRegistry.CONFIG_SERIALIZER.get(new Identifier("java:string_serializer"));
 			case "char":
 			case "java.lang.Character":
-				return  (AbstractConfigSerializable<T>) BFAPIRegistry.CONFIG_SERIALIZER.get(new Identifier(ID, "character_serializer"));
+				return  (AbstractConfigSerializable<T>) BFAPIRegistry.CONFIG_SERIALIZER.get(new Identifier("java:character_serializer"));
 			case "boolean":
 			case "java.lang.Boolean":
-				return  (AbstractConfigSerializable<T>) BFAPIRegistry.CONFIG_SERIALIZER.get(new Identifier(ID, "boolean_serializer"));
+				return  (AbstractConfigSerializable<T>) BFAPIRegistry.CONFIG_SERIALIZER.get(new Identifier("java:boolean_serializer"));
 		}
 		AbstractConfigSerializable<T> bestSerializer = null;
 		for (Entry<RegistryKey<AbstractConfigSerializable<?>>, AbstractConfigSerializable<?>> entry : BFAPIRegistry.CONFIG_SERIALIZER.getEntries()) {
@@ -144,6 +143,7 @@ public class Config {
 	
 	protected Config(@NotNull Identifier identifier) {
 		this.identifier = identifier;
+		init(); // just in case
 	}
 	
 	public void save() {

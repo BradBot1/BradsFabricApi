@@ -35,7 +35,7 @@ public class Loader implements ModInitializer {
 	public void onInitialize() {
 		_INSTANCE = this;
 		LOGGER.info("Isn't "+NAME+" "+VERSION+" funky?");
-		Config.init(this);
+		Config.init();
 		GameObjects.GameEvents.SERVER_START.addHandler((i)->{
 			loadPermissions();
 		});

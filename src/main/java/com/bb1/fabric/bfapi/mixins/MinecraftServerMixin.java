@@ -8,6 +8,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.bb1.fabric.bfapi.GameObjects;
+import com.bb1.fabric.bfapi.Loader;
+import com.bb1.fabric.bfapi.timings.ThreadedScheduler;
 import com.bb1.fabric.bfapi.utils.Inputs.Input;
 
 import net.minecraft.server.MinecraftServer;
@@ -39,6 +41,7 @@ public class MinecraftServerMixin {
 	@Inject(method = "shutdown()V", at = @At("HEAD"))
 	public void serverStopped(CallbackInfo callbackInfo) {
 		GameObjects.GameEvents.SERVER_STOP.emit(Input.of((MinecraftServer) (Object) this));
+		((ThreadedScheduler)Loader.getScheduler()).stop();
 	}
 	
 	@Inject(method = "tick(Ljava/util/function/BooleanSupplier;)V", at = @At("INVOKE"))
