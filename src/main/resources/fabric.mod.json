@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "id": "${id}",
-  "version": "${version}",
+  "id": "bfapi",
+  "version": "1.2.0",
 
-  "name": "${name}",
-  "description": "A funky template mod",
+  "name": "BFAPI",
+  "description": "A funky api",
   "authors": [
     "BradBot_1"
   ],
   "contact": {
     "homepage": "https://github.com/BradBot1",
-    "sources": "https://github.com/BradBot1/Fabric-Template",
-    "issues": "https://github.com/BradBot1/Fabric-Template/issues"
+    "sources": "https://github.com/BradBot1/BradsFabricApi",
+    "issues": "https://github.com/BradBot1/BradsFabricApi/issues"
   },
 
   "license": "Apache License v2",
@@ -20,14 +20,14 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "${path}.${id}.Loader"
+      "com.bb1.fabric.bfapi.Loader"
     ]
   },
   "mixins": [
-    "${id}.mixins.json"
+    "bfapi.mixins.json"
   ],
  
-  "accessWidener" : "${id}.accesswidener",
+  "accessWidener" : "bfapi.accesswidener",
 
   "depends": {
     "fabricloader": ">=0.11.3",

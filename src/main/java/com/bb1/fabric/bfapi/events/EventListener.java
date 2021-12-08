@@ -24,7 +24,6 @@ public interface EventListener extends IRegisterable {
 		final Object ref = this;
 		for (Method method : getClass().getMethods()) {
 			EventHandler handler = method.getAnnotation(EventHandler.class);
-			System.out.println(method.getName());
 			if (handler!=null) {
 				method.setAccessible(true);
 				BFAPIRegistry.EVENTS.getOrEmpty(new Identifier(handler.eventIdentifier())).ifPresentOrElse((event)->{

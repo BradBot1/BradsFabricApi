@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "${path}.${id}.mixins",
+  "package": "com.bb1.fabric.bfapi.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
  	"MarkableItemMixin",

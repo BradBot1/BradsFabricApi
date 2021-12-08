@@ -5,11 +5,11 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
+archivesBaseName = "bfapi"
+group = "com.bb1.fabric"
+version = "1.2.0"
+
 ext {
-	version = project.mod_version
-	name = project.mod_name
-	id = project.mod_name.toLowerCase().replaceAll("[^a-z]", "")
-	path = project.mod_path
 	FindFile = { list, curPath, addDirs ->
 		def files = file(curPath).listFiles().sort()
 		files.each {  File file ->
@@ -24,13 +24,7 @@ ext {
 		}
 		return list
 	}
-	constantsContents = ""
 }
-
-// for file renaming and compat with fabric
-archivesBaseName = project.ext.id
-group = project.ext.path
-version = project.ext.version
 
 build.finalizedBy clean
 
@@ -46,42 +40,8 @@ dependencies {
 	modCompileOnly fileTree(dir: "$projectDir/libs/", includes: ['*-dev.jar'])
 }
 
-remapJar {
-	if (project.shouldFillConstantsFile) {
-		def cleanedPath = "$projectDir/src/main/java/" + project.ext.path.replaceAll("\\.", "/") + "/${project.ext.id}/${project.mod_constants}.java"
-		println "Attempting to find the constants file (${cleanedPath})"
-		def file = new File(cleanedPath)
-		if (file.exists()) {
-			println "Found, filling constants file"
-			project.ext.constantsContents = file.getText()
-			file.setText(file.getText().replace("\${id}", project.ext.id).replace("\${name}", project.ext.name).replace("\${path}", project.ext.path).replace("\${version}", project.ext.version))
-			println "Complete"
-		} else {
-			println "The given constants file does not exist, if this is on purpose please toggle shouldFillConstantsFile in gradle.properties"
-		}
-	}
-}
-
 loom {
-	accessWidenerPath = file("src/main/resources/\$id.accesswidener")
-}
-
-processResources {
-	inputs.property "version", project.ext.version
-	inputs.property "id", project.ext.id
-	inputs.property "name", project.ext.name
-	inputs.property "path", project.ext.path
-	
-	filesNotMatching(["**/*.png", "**/*.jpg", "**/*.gif", "**/*.accesswidener"]) {
-		expand "id": project.ext.id, "name": project.ext.name, "version": project.ext.version, "path": project.ext.path
-	}
-	
-	filesMatching("**/*") {
-		it.path = it.path.replace('\$id', project.ext.id)
-					.replace('\$name', project.ext.name)
-					.replace('\$path', project.ext.path)
-					.replace('\$version', project.ext.version)
-	}
+	accessWidenerPath = file("src/main/resources/bfapi.accesswidener")
 }
 
 build {
@@ -93,39 +53,15 @@ build {
 		}
 		fileTree(dir: "$buildDir/libs/", includes: ['*.jar'])
 		.visit { elem ->
-			def newName = elem.file.name.replace("-${project.ext.version}", "")
+			def newName = elem.file.name.replace("-${version}", "")
 			ant.move(file: elem.file.path, tofile: new File("$projectDir/output/${version}/${newName}"))
 		}
 		println "Complete"
 	}
 }
 
-clean {
-/*
-	FindFile([], "output/", true).each {
-		it.delete();
-	}
-	new File("output").mkdirs()
-	new File("output/README.md") << "All outputs will automatically be put here"
-*/
-	doLast {
-		if (project.shouldFillConstantsFile) {
-			def cleanedPath = "$projectDir/src/main/java/" + project.ext.path.replaceAll("\\.", "/") + "/${project.ext.id}/${project.mod_constants}.java"
-			println "Attempting to find the constants file (${cleanedPath})"
-			def file = new File(cleanedPath)
-			if (file.exists()) {
-				println "Found, unfilling constants file"
-				file.setText(project.ext.constantsContents)
-				println "Complete"
-			} else {
-				println "The given constants file does not exist, if this is on purpose please toggle shouldFillConstantsFile in gradle.properties"
-			}
-		}
-	}
-}
-
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 16
+	it.options.release = 17
 }
 
 java {
@@ -134,6 +70,6 @@ java {
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.ext.id}"}
+		rename { "${it}_bfapi"}
 	}
 }
