@@ -3,7 +3,13 @@
   "minVersion": "0.8",
   "package": "${path}.${id}.mixins",
   "compatibilityLevel": "JAVA_16",
-  "mixins": [],
+  "mixins": [
+ 	"MarkableItemMixin",
+ 	"CommandRegistrationMixin",
+ 	"MinecraftServerMixin",
+ 	"CommandMangerMixin",
+ 	"ReloadMixin"
+ ],
   "client": [],
   "injectors": {
     "defaultRequire": 1

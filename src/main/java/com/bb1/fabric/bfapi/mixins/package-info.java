@@ -1,4 +1,4 @@
 /**
  * Where the mixin magic happens
  */
-package com.bb1.templatemod.mixin;
+package com.bb1.fabric.bfapi.mixins;

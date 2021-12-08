@@ -2,8 +2,8 @@ plugins {
 	id 'fabric-loom' version '0.10-SNAPSHOT'
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 ext {
 	version = project.mod_version
@@ -62,13 +62,17 @@ remapJar {
 	}
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/\$id.accesswidener")
+}
+
 processResources {
 	inputs.property "version", project.ext.version
 	inputs.property "id", project.ext.id
 	inputs.property "name", project.ext.name
 	inputs.property "path", project.ext.path
 	
-	filesNotMatching(["**/*.png", "**/*.jpg", "**/*.gif"]) {
+	filesNotMatching(["**/*.png", "**/*.jpg", "**/*.gif", "**/*.accesswidener"]) {
 		expand "id": project.ext.id, "name": project.ext.name, "version": project.ext.version, "path": project.ext.path
 	}
 	
