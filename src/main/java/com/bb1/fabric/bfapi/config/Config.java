@@ -148,11 +148,11 @@ public class Config {
 	
 	public void save() {
 		JsonObject jsonObject = new JsonObject();
-		final Method method = ExceptionWrapper.exectuteWithReturn(null, SERIALIZER_GRABBER);
+		final Method method = ExceptionWrapper.executeWithReturn(null, SERIALIZER_GRABBER);
 		method.setAccessible(true);
 		for (Field field : getClass().getDeclaredFields()) {
 			if (field.isAnnotationPresent(ConfigIgnore.class) || field.getDeclaringClass().isAnnotationPresent(ConfigIgnore.class) || Modifier.isStatic(field.getModifiers())|| Modifier.isFinal(field.getModifiers())) { continue; }
-			final Object instance = ExceptionWrapper.exectuteWithReturn(DualInput.of(field, this), (i)->i.get().get(i.getSecond()));
+			final Object instance = ExceptionWrapper.executeWithReturn(DualInput.of(field, this), (i)->i.get().get(i.getSecond()));
 			if (instance==null) {
 				LOGGER.warn("Failed to save the field "+field.getName()+" of "+this.identifier.toString());
 				continue;
@@ -177,7 +177,7 @@ public class Config {
 				final ConfigComment comment = field.getAnnotation(ConfigComment.class);
 				current.addProperty(comment.prefix()+field.getName(), comment.contents());
 			}
-			current.add(field.isAnnotationPresent(ConfigName.class) ? field.getAnnotation(ConfigName.class).name() : field.getName(), ExceptionWrapper.exectuteWithReturn(TriInput.of(method, ser, com.bb1.fabric.bfapi.utils.Field.of(instance)), SERIALIZER_INVOKER));
+			current.add(field.isAnnotationPresent(ConfigName.class) ? field.getAnnotation(ConfigName.class).name() : field.getName(), ExceptionWrapper.executeWithReturn(TriInput.of(method, ser, com.bb1.fabric.bfapi.utils.Field.of(instance)), SERIALIZER_INVOKER));
 		}
 		try {
 			new File(CONFIG_DIRECTORY+this.identifier.getNamespace()+File.separatorChar).mkdirs();
@@ -214,7 +214,7 @@ public class Config {
 			return;
 		}
 		JsonObject jsonObject = contents.getAsJsonObject();
-		final Method method = ExceptionWrapper.exectuteWithReturn(null, DESERIALIZER_GRABBER);
+		final Method method = ExceptionWrapper.executeWithReturn(null, DESERIALIZER_GRABBER);
 		method.setAccessible(true);
 		for (Field field : getClass().getFields()) {
 			if (field.isAnnotationPresent(ConfigIgnore.class) || field.getDeclaringClass().isAnnotationPresent(ConfigIgnore.class) || Modifier.isStatic(field.getModifiers())|| Modifier.isFinal(field.getModifiers())) { continue; }
@@ -239,7 +239,7 @@ public class Config {
 				LOGGER.warn("Failed to save the field "+field.getName()+" of "+this.identifier.toString()+"! There is not a registered serializer for this type");
 				continue;
 			}
-			ExceptionWrapper.execute(TriInput.of(field, this, ExceptionWrapper.exectuteWithReturn(TriInput.of(method, ser, com.bb1.fabric.bfapi.utils.Field.of(instance)), DESERIALIZER_INVOKER)), DESERIALIZER_SETTER);
+			ExceptionWrapper.execute(TriInput.of(field, this, ExceptionWrapper.executeWithReturn(TriInput.of(method, ser, com.bb1.fabric.bfapi.utils.Field.of(instance)), DESERIALIZER_INVOKER)), DESERIALIZER_SETTER);
 		}
 	}
 	

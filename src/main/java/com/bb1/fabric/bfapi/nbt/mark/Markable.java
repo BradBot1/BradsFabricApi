@@ -29,7 +29,7 @@ import com.bb1.fabric.bfapi.utils.ExceptionWrapper;
 public interface Markable {
 	
 	public static @Nullable Markable getMarkable(@Nullable Object input) {
-		return ExceptionWrapper.exectuteWithReturn(input, (i)->(Markable)i);
+		return ExceptionWrapper.executeWithReturn(input, (i)->(Markable)i);
 	}
 	
 	public static final String MARK_TAG = "Marks";

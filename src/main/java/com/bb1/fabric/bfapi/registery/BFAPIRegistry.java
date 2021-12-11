@@ -67,8 +67,10 @@ public class BFAPIRegistry<T> extends SimpleRegistry<T> {
 		if (onIntake!=null) { this.onIntake = onIntake; }
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public <V extends T> @Nullable V add(RegistryKey<T> key, V entry, Lifecycle lifecycle) {
+		if (this.contains(key)) { return (@Nullable V) this.get(key); }
 		if (!this.onIntake.apply(TriInput.of(key, entry, lifecycle))) { return null; }
 		return super.add(key, entry, lifecycle);
 	}
