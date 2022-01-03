@@ -11,7 +11,7 @@ import net.minecraft.util.Identifier;
 public class PermissionConfig extends Config {
 
 	public PermissionConfig() {
-		super(new Identifier(ID, "permission_config"));
+		super(new Identifier(ID, "permissions"));
 	}
 	
 	@ConfigComment(contents = "If the default permission handler should be registered, you may want to turn this off if you have a different handler registered")

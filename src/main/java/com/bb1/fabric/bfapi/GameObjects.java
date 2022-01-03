@@ -4,11 +4,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.bb1.fabric.bfapi.events.Event;
+import com.bb1.fabric.bfapi.utils.Container;
 import com.bb1.fabric.bfapi.utils.Inputs.Input;
+import com.bb1.fabric.bfapi.utils.Inputs.QuadInput;
+import com.bb1.fabric.bfapi.utils.Inputs.QuintInput;
 import com.mojang.brigadier.CommandDispatcher;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public final class GameObjects {
 	
@@ -36,6 +44,10 @@ public final class GameObjects {
 		public static final Event<Input<CommandDispatcher<ServerCommandSource>>> COMMAND_REGISTRATION = new Event<Input<CommandDispatcher<ServerCommandSource>>>("minecraft:command_registration");
 		
 		public static final Event<Input<Void>> SERVER_RELOAD = new Event<Input<Void>>("minecraft:server_reload");
+		
+		public static final Event<QuadInput<PlayerEntity, BlockPos, World, Container<Boolean>>> PLAYER_ATTEMPT_MODIFICATION = new Event<QuadInput<PlayerEntity, BlockPos, World, Container<Boolean>>>("minecraft:server_reload");
+		
+		public static final Event<QuintInput<ItemStack, World, @Nullable BlockPos, @Nullable Entity, Container<Boolean>>> ITEM_USE = new Event<QuintInput<ItemStack, World, @Nullable BlockPos, @Nullable Entity, Container<Boolean>>>("minecraft:item_use");
 		
 	}
 	

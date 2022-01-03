@@ -103,6 +103,24 @@ public final class Inputs {
 		
 	}
 	
+	public static class QuintInput<I, I2, I3, I4, I5> extends QuadInput<I, I2, I3, I4> {
+		
+		public static <I, I2, I3, I4, I5> QuintInput<I, I2, I3, I4, I5> of(I i, I2 i2, I3 i3, I4 i4, I5 i5) { return new QuintInput<I, I2, I3, I4, I5>(i, i2, i3, i4, i5); }
+		
+		protected final I5 i5;
+		
+		public QuintInput(I i, I2 i2, I3 i3, I4 i4, I5 i5) {
+			super(i, i2, i3, i4);
+			this.i5 = i5;
+		}
+		
+		public I5 getFith() { return this.i5; }
+		
+		@Override
+		public Field<?>[] getAll() { return new Field<?>[] { Field.of(this.i), Field.of(this.i2), Field.of(this.i3), Field.of(this.i4), Field.of(this.i5) }; }
+		
+	}
+	
 	public static class DynamicInput extends Input<Void> {
 		
 		public static DynamicInput of(Object value, Object... others) {
