@@ -259,6 +259,9 @@ public class Config {
 				}
 			}
 		}
+		if (bestSerializer==null) {
+			LOGGER.warn("There is no provided serializer for "+wantedClazz.getName());
+		}
 		return bestSerializer;
 	}
 	
@@ -313,16 +316,21 @@ public class Config {
 		for (Field field : getClass().getDeclaredFields()) {
 			if (field.isAnnotationPresent(ConfigIgnore.class) || field.getDeclaringClass().isAnnotationPresent(ConfigIgnore.class) || Modifier.isStatic(field.getModifiers())|| Modifier.isFinal(field.getModifiers())) { continue; }
 			final String fieldName = field.isAnnotationPresent(ConfigName.class) ? field.getAnnotation(ConfigName.class).name() : field.getName();
-			subSubCmd.addChild(getSerializer(field.getDeclaringClass(), true).addSetter(CommandManager.literal(fieldName)
-					.then(CommandManager.literal("get")
-							.executes((cs)->{
-								final Method method = ExceptionWrapper.executeWithReturn(null, SERIALIZER_GRABBER);
-								method.setAccessible(true);
-								cs.getSource().sendFeedback(new LiteralText(fieldName + " is set to " + ExceptionWrapper.executeWithReturn(TriInput.of(method, getSerializer(field.getDeclaringClass(), true), com.bb1.fabric.bfapi.utils.Field.of(ExceptionWrapper.executeWithReturn(DualInput.of(field, this), (i)->i.get().get(i.getSecond())))), SERIALIZER_INVOKER)), true);
-								return 1;
-							})
-						).then(CommandManager.literal("set")), this, field, fieldName).build());
+			final LiteralArgumentBuilder<ServerCommandSource> innerCmd = CommandManager.literal(fieldName);
+			innerCmd.then(CommandManager.literal("get")
+					.executes((cs)->{
+						final Method method = ExceptionWrapper.executeWithReturn(null, SERIALIZER_GRABBER);
+						method.setAccessible(true);
+						cs.getSource().sendFeedback(new LiteralText(fieldName + " is set to " + ExceptionWrapper.executeWithReturn(TriInput.of(method, getSerializer(field.getType(), true), com.bb1.fabric.bfapi.utils.Field.of(ExceptionWrapper.executeWithReturn(DualInput.of(field, this), (i)->i.get().get(i.getSecond())))), SERIALIZER_INVOKER)), true);
+						return 1;
+					})
+				);
+			var setter = CommandManager.literal("set");
+			getSerializer(field.getType(), true).addSetter(setter, this, field, fieldName);
+			innerCmd.then(setter);
+			subSubCmd.addChild(innerCmd.build());
 		}
+		subCmd.addChild(subSubCmd);
 	}
 	
 	public void save() {
