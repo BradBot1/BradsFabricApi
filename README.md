@@ -85,7 +85,7 @@ public class ExampleListener implements EventListener {
 	public ExampleListener() {
 		// Here we auto register all events
 		// Doing it in the constructor removes complexity
-		register(null);
+		register();
 	}
 	
 	// We use an annotation to say what event to bind to

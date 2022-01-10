@@ -39,5 +39,7 @@ public interface Markable {
 	public boolean hasMark(String mark);
 	
 	public Set<String> getMarks();
+	/** If the {@link Markable} instance has any marks */
+	public default boolean hasMarks() { return this.getMarks().size()!=0; }
 	
 }

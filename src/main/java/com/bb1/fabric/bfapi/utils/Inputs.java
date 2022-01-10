@@ -47,6 +47,8 @@ public final class Inputs {
 		
 		public Field<?>[] getAll() { return new Field<?>[] { Field.of(this.i) }; }
 		
+		public Object[] getAllRaw() { return new Object[] { this.i }; }
+		
 	}
 	
 	public static class DualInput<I, I2> extends Input<I> {
@@ -64,6 +66,9 @@ public final class Inputs {
 		
 		@Override
 		public Field<?>[] getAll() { return new Field<?>[] { Field.of(this.i), Field.of(this.i2) }; }
+		
+		@Override
+		public Object[] getAllRaw() { return new Object[] { this.i, this.i2 }; }
 		
 	}
 	
@@ -83,6 +88,9 @@ public final class Inputs {
 		@Override
 		public Field<?>[] getAll() { return new Field<?>[] { Field.of(this.i), Field.of(this.i2), Field.of(this.i3) }; }
 		
+		@Override
+		public Object[] getAllRaw() { return new Object[] { this.i, this.i2, this.i3 }; }
+		
 	}
 	
 	public static class QuadInput<I, I2, I3, I4> extends TriInput<I, I2, I3> {
@@ -101,6 +109,9 @@ public final class Inputs {
 		@Override
 		public Field<?>[] getAll() { return new Field<?>[] { Field.of(this.i), Field.of(this.i2), Field.of(this.i3), Field.of(this.i4) }; }
 		
+		@Override
+		public Object[] getAllRaw() { return new Object[] { this.i, this.i2, this.i3, this.i4 }; }
+		
 	}
 	
 	public static class QuintInput<I, I2, I3, I4, I5> extends QuadInput<I, I2, I3, I4> {
@@ -118,6 +129,9 @@ public final class Inputs {
 		
 		@Override
 		public Field<?>[] getAll() { return new Field<?>[] { Field.of(this.i), Field.of(this.i2), Field.of(this.i3), Field.of(this.i4), Field.of(this.i5) }; }
+		
+		@Override
+		public Object[] getAllRaw() { return new Object[] { this.i, this.i2, this.i3, this.i4, this.i5 }; }
 		
 	}
 	
@@ -152,6 +166,9 @@ public final class Inputs {
 			}
 			return fields;
 		}
+		
+		@Override
+		public Object[] getAllRaw() { return this._inputs.toArray(); }
 		
 	}
 	

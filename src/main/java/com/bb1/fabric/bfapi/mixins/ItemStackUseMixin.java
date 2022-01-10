@@ -6,7 +6,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.bb1.fabric.bfapi.GameObjects;
+import com.bb1.fabric.bfapi.Loader;
 import com.bb1.fabric.bfapi.utils.Container;
+import com.bb1.fabric.bfapi.utils.Field;
 import com.bb1.fabric.bfapi.utils.Inputs.QuintInput;
 
 import net.minecraft.entity.LivingEntity;
@@ -43,6 +45,12 @@ public class ItemStackUseMixin {
 		final ItemStack is = (ItemStack)(Object)this;
 		Container<Boolean> container = new Container<Boolean>(false);
 		GameObjects.GameEvents.ITEM_USE.emit(QuintInput.of(is, context.getWorld(), context.getBlockPos(), context.getPlayer(), container));
+		if (!container.getValue()) {
+			callback.setReturnValue(ActionResult.FAIL);
+			callback.cancel();
+		}
+		// We can reuse the container as it has to be false to get here
+		Loader.MARK_ITEM_USED.emit(QuintInput.of(is, context.getWorld(), context.getBlockPos(), Field.of(context.getPlayer()), container));
 		if (!container.getValue()) {
 			callback.setReturnValue(ActionResult.FAIL);
 			callback.cancel();
