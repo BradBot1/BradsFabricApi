@@ -49,7 +49,7 @@ public class Loader implements ModInitializer {
 	/**
 	 * Called when an itemstack is used that has the mark
 	 */
-	public static final Event<QuintInput<ItemStack, World, BlockPos, Field<Entity>, Container<Boolean>>> MARK_ARMOUR_USED = new Event<QuintInput<ItemStack, World, BlockPos, Field<Entity>, Container<Boolean>>>(new Identifier(ID, "marked_item_used"));
+	public static final Event<QuintInput<ItemStack, World, BlockPos, Field<Entity>, Container<Boolean>>> MARK_ARMOUR_USED = new Event<QuintInput<ItemStack, World, BlockPos, Field<Entity>, Container<Boolean>>>(new Identifier(ID, "marked_armour_used"));
 	
 	@Override
 	public void onInitialize() {

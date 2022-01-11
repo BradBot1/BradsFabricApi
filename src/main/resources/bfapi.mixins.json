@@ -10,7 +10,9 @@
  	"ReloadMixin",
  	"RespectSuperCanModifyMixin",
  	"CanPlayerModifyMixin",
- 	"MarkableEntityMixin"
+ 	"MarkableEntityMixin",
+ 	"EntityHitMixin",
+ 	"ItemStackUseMixin"
  ],
   "client": [],
   "injectors": {

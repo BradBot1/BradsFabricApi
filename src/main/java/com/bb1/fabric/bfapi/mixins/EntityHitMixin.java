@@ -19,29 +19,32 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
 @Mixin(LivingEntity.class)
-public abstract class HitMixin {
+public abstract class EntityHitMixin {
 	
 	@Shadow public abstract Iterable<ItemStack> getArmorItems();
 	
-	@Inject(method = "damage", at = @At("HEAD"))
-	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> callback) {
+	@Inject(method = "damage", at = @At("HEAD"), cancellable = true)
+	public void onEntityDamagedCallEvents(DamageSource source, float amount, CallbackInfoReturnable<Boolean> callback) {
 		Entity entity = (Entity) (Object) this;
-		Container<Boolean> container = new Container<Boolean>();
-		Entity s = source.getSource();
-		if (s==null) {
-			Loader.MARK_ENTITY_HIT.emit(QuintInput.of(Field.of(entity), entity.getWorld(), null, null, container));
-		} else {
-			Loader.MARK_ENTITY_HIT.emit(QuintInput.of(Field.of(entity), entity.getWorld(), Field.of(s), s instanceof PlayerEntity p ? p.getInventory().getMainHandStack() : s.getItemsHand().iterator().next(), container));
-		}
-		if (!container.getValue()) {
-			callback.setReturnValue(false);
-			callback.cancel();
+		Container<Boolean> container = new Container<Boolean>(false);
+		if (Markable.getMarkable(entity).hasMarks()) {
+			Entity s = source.getSource();
+			if (s==null) { s = source.getAttacker(); }
+			if (s==null) {
+				Loader.MARK_ENTITY_HIT.emit(QuintInput.of(Field.of(entity), entity.getWorld(), null, null, container));
+			} else {
+				Loader.MARK_ENTITY_HIT.emit(QuintInput.of(Field.of(entity), entity.getWorld(), Field.of(s), s instanceof PlayerEntity p ? p.getInventory().getMainHandStack() : s.getItemsHand().iterator().next(), container));
+			}
+			if (container.getValue()) {
+				callback.setReturnValue(false);
+				callback.cancel();
+			}
 		}
 		for (ItemStack is : getArmorItems()) {
 			Markable mark = Markable.getMarkable(is);
 			if (mark.hasMarks()) {
 				Loader.MARK_ARMOUR_USED.emit(QuintInput.of(is, entity.getWorld(), entity.getBlockPos(), Field.of(entity), container));
-				if (!container.getValue()) {
+				if (container.getValue()) {
 					callback.setReturnValue(false);
 					callback.cancel();
 				}

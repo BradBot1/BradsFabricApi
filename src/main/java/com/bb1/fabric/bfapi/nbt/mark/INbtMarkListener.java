@@ -10,6 +10,7 @@ import com.bb1.fabric.bfapi.utils.Field;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -30,7 +31,8 @@ public interface INbtMarkListener extends IRegisterable {
 	 */
 	public boolean onArmourUsed(ItemStack usedItemStack, World world, @Nullable BlockPos hitLocation, Field<Entity> usingEntity, boolean canceled);
 	
-	public default void register(String name) {
+	@Override
+	default void register(@Nullable Identifier name) {
 		Registry.register(MARK_LISTENER, name, this);
 	}
 	

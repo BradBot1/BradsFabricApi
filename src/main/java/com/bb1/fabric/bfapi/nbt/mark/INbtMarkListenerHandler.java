@@ -1,6 +1,7 @@
 package com.bb1.fabric.bfapi.nbt.mark;
 
 import static com.bb1.fabric.bfapi.Constants.ID;
+import static com.bb1.fabric.bfapi.nbt.mark.Markable.getMarkable;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -8,8 +9,6 @@ import com.bb1.fabric.bfapi.events.EventListener;
 import com.bb1.fabric.bfapi.registery.BFAPIRegistry;
 import com.bb1.fabric.bfapi.utils.Container;
 import com.bb1.fabric.bfapi.utils.Field;
-
-import static com.bb1.fabric.bfapi.nbt.mark.Markable.getMarkable;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -53,6 +52,7 @@ public class INbtMarkListenerHandler implements EventListener {
 	
 	@EventHandler(eventIdentifier = ID+":marked_entity_hit", decomposeArguments = true, logOnFailedBinding = true)
 	public void onEntityHit(Field<Entity> hitEntity, @Nullable World world, @Nullable Field<Entity> attackingEntity, @Nullable ItemStack usedItemStack, Container<Boolean> container) {
+		// FIXME: this is buggy for some reason?
 		final Markable markable = hitEntity.get();
 		for (final String mark : markable.getMarks()) {
 			BFAPIRegistry.MARK_LISTENER.stream().filter((n)->n.getMark().equals(mark)).forEach((n)->{
@@ -63,12 +63,12 @@ public class INbtMarkListenerHandler implements EventListener {
 		}
 	}
 	
-	@EventHandler(eventIdentifier = ID+":marked_item_used", decomposeArguments = true, logOnFailedBinding = true)
+	@EventHandler(eventIdentifier = ID+":marked_armour_used", decomposeArguments = true, logOnFailedBinding = true)
 	public void onArmourUsed(ItemStack usedItemStack, World world, @Nullable BlockPos hitLocation, Field<Entity> usingEntity, Container<Boolean> container) {
 		final Markable markable = getMarkable(usedItemStack);
 		for (final String mark : markable.getMarks()) {
 			BFAPIRegistry.MARK_LISTENER.stream().filter((n)->n.getMark().equals(mark)).forEach((n)->{
-				if (n.onItemUse(usedItemStack, world, hitLocation, usingEntity, container.getValue())) {
+				if (n.onArmourUsed(usedItemStack, world, hitLocation, usingEntity, container.getValue())) {
 					container.setValue(true);
 				}
 			});
