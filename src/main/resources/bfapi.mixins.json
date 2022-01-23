@@ -12,7 +12,8 @@
  	"CanPlayerModifyMixin",
  	"MarkableEntityMixin",
  	"EntityHitMixin",
- 	"ItemStackUseMixin"
+ 	"ItemStackUseMixin",
+ 	"RecipeRestrictionMixin"
  ],
   "client": [],
   "injectors": {

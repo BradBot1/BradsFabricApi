@@ -13,6 +13,8 @@ import com.bb1.fabric.bfapi.events.Event;
 import com.bb1.fabric.bfapi.nbt.mark.INbtMarkListenerHandler;
 import com.bb1.fabric.bfapi.permissions.PermissionConfig;
 import com.bb1.fabric.bfapi.permissions.database.SimplePermissionDatabase;
+import com.bb1.fabric.bfapi.recipe.AbstractRecipe;
+import com.bb1.fabric.bfapi.recipe.RecipeLoader;
 import com.bb1.fabric.bfapi.timings.IScheduler;
 import com.bb1.fabric.bfapi.timings.ThreadedScheduler;
 import com.bb1.fabric.bfapi.utils.Container;
@@ -56,8 +58,10 @@ public class Loader implements ModInitializer {
 		_INSTANCE = this;
 		LOGGER.info("Isn't "+NAME+" "+VERSION+" funky?");
 		Config.init();
+		AbstractRecipe.init();
 		loadPermissions();
 		setupMarkHandling();
+		RecipeLoader.loadRecipes();
 		LOADER_LOADED.emit(Input.of(this));
 	}
 	

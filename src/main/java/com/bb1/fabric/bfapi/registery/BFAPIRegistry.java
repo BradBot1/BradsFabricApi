@@ -3,23 +3,31 @@ package com.bb1.fabric.bfapi.registery;
 import static com.bb1.fabric.bfapi.Constants.ID;
 import static net.minecraft.util.registry.RegistryKey.ofRegistry;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.function.Function;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.bb1.fabric.bfapi.GameObjects;
 import com.bb1.fabric.bfapi.config.AbstractConfigSerializable;
 import com.bb1.fabric.bfapi.events.Event;
 import com.bb1.fabric.bfapi.gamerules.AbstractGamerule;
 import com.bb1.fabric.bfapi.nbt.mark.INbtMarkListener;
 import com.bb1.fabric.bfapi.permissions.Permission;
 import com.bb1.fabric.bfapi.permissions.database.IPermissionDatabase;
+import com.bb1.fabric.bfapi.recipe.AbstractRecipe;
 import com.bb1.fabric.bfapi.utils.ExceptionWrapper;
 import com.bb1.fabric.bfapi.utils.Inputs.DualInput;
 import com.bb1.fabric.bfapi.utils.Inputs.TriInput;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.serialization.Lifecycle;
 
+import net.minecraft.recipe.Recipe;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Identifier;
@@ -47,6 +55,36 @@ public class BFAPIRegistry<T> extends SimpleRegistry<T> {
 	});
 	public static final BFAPIRegistry<Permission> PERMISSIONS = new BFAPIRegistry<Permission>("permissions");
 	public static final BFAPIRegistry<IPermissionDatabase> PERMISSION_DATABASES = new BFAPIRegistry<IPermissionDatabase>("permission_databases");
+	private static final Queue<Recipe<?>> RECIPES_TO_BE_ADDED = new LinkedList<>();	
+	@SuppressWarnings("resource")
+	public static final BFAPIRegistry<AbstractRecipe> RECIPES = new BFAPIRegistry<AbstractRecipe>("recipes", (i)->{
+		Recipe<?> recipe = (Recipe<?>) (Object) i.getSecond().buildWrappedRecipe(i.get().getValue());
+		if (GameObjects.getMinecraftServer()==null) {
+			if (RECIPES_TO_BE_ADDED.isEmpty()) {
+				GameObjects.GameEvents.SERVER_START.addHandler((i2)->{
+					List<Recipe<?>> recipes = new ArrayList<Recipe<?>>(); // MAYBE: work out a good default length?
+					for (Map<Identifier, Recipe<?>> map : GameObjects.getMinecraftServer().getRecipeManager().recipes.values()) {
+						recipes.addAll(map.values());
+					}
+					Recipe<?> r = RECIPES_TO_BE_ADDED.poll();
+					while (r!=null) {
+						recipes.add(r);
+						r = RECIPES_TO_BE_ADDED.poll();
+					}
+					GameObjects.getMinecraftServer().getRecipeManager().setRecipes(recipes);
+				});
+			}
+			RECIPES_TO_BE_ADDED.add(recipe);
+			return true;
+		}
+		List<Recipe<?>> recipes = new ArrayList<Recipe<?>>(); // MAYBE: work out a good default length?
+		for (Map<Identifier, Recipe<?>> map : GameObjects.getMinecraftServer().getRecipeManager().recipes.values()) {
+			recipes.addAll(map.values());
+		}
+		recipes.add(recipe);
+		GameObjects.getMinecraftServer().getRecipeManager().setRecipes(recipes);
+		return true;
+	});
 	
 	private @NotNull Function<TriInput<RegistryKey<T>, T, Lifecycle>, Boolean> onIntake = (i)->true;
 	

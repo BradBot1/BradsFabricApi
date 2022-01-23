@@ -1,5 +1,6 @@
 package com.bb1.fabric.bfapi.config;
 
+import static com.bb1.fabric.bfapi.Constants.GSON;
 import static com.bb1.fabric.bfapi.Constants.ID;
 
 import java.io.BufferedWriter;
@@ -25,15 +26,17 @@ import com.bb1.fabric.bfapi.Constants;
 import com.bb1.fabric.bfapi.GameObjects;
 import com.bb1.fabric.bfapi.permissions.Permission;
 import com.bb1.fabric.bfapi.permissions.PermissionLevel;
+import com.bb1.fabric.bfapi.recipe.AbstractRecipe;
+import com.bb1.fabric.bfapi.recipe.IRecipeRequirement;
+import com.bb1.fabric.bfapi.recipe.IRecipeResult;
 import com.bb1.fabric.bfapi.registery.BFAPIRegistry;
 import com.bb1.fabric.bfapi.utils.ExceptionWrapper;
 import com.bb1.fabric.bfapi.utils.ExceptionWrapper.ExceptionWrapperWithoutReturn;
 import com.bb1.fabric.bfapi.utils.Inputs.DualInput;
 import com.bb1.fabric.bfapi.utils.Inputs.Input;
+import com.bb1.fabric.bfapi.utils.Inputs.QuintInput;
 import com.bb1.fabric.bfapi.utils.Inputs.TriInput;
 import com.bb1.fabric.bfapi.utils.NbtUtils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -84,6 +87,43 @@ public class Config {
 			}
 			return cmd;
 		});
+		new InlineConfigSerializer<AbstractRecipe>(ID, AbstractRecipe.class, (n)->{
+			final JsonObject js = new JsonObject();
+			js.addProperty("type", n.getType().toString());
+			if (n.getGroup()!=null) { js.addProperty("group", n.getGroup()); }
+			final AbstractConfigSerializable<ItemStack> isS = getSerializer(ItemStack.class, false);
+			js.add("icon", isS.serialize(com.bb1.fabric.bfapi.utils.Field.of(n.getResultIcon())));
+			JsonObject requirements = new JsonObject();
+			for (IRecipeRequirement req : n.getRequirements()) {
+				requirements = req.addToObject(requirements);
+			}
+			js.add("requirements", requirements);
+			JsonObject results = new JsonObject();
+			for (IRecipeResult result : n.getResults()) {
+				results = result.addToObject(results);
+			}
+			js.add("results", results);
+			return n.serialize(js);
+		}, (js2)->{
+			final JsonObject js = js2.getAsJsonObject();
+			final Identifier type = new Identifier(js.get("type").getAsString());
+			final @Nullable String group = js.get("group").getAsString();
+			final AbstractConfigSerializable<ItemStack> isS = getSerializer(ItemStack.class, false);
+			final ItemStack icon = isS.deserialize(com.bb1.fabric.bfapi.utils.Field.of(js.get("icon")));
+			JsonObject obj = js.get("requirements").getAsJsonObject();
+			final IRecipeRequirement[] requirements = new IRecipeRequirement[obj.entrySet().size()];
+			int index = 0;
+			for (Entry<String, JsonElement> elem : obj.entrySet()) {
+				requirements[index++] = AbstractRecipe.buildRequirement(elem.getKey(), elem.getValue());
+			}
+			obj = js.get("results").getAsJsonObject();
+			final IRecipeResult[] results = new IRecipeResult[obj.entrySet().size()];
+			index = 0;
+			for (Entry<String, JsonElement> elem : obj.entrySet()) {
+				results[index++] = AbstractRecipe.buildResult(elem.getKey(), elem.getValue());
+			}
+			return AbstractRecipe.buildRecipe(type, QuintInput.of(group, icon, requirements, results, js));
+		}); // IMP: add command support stuff
 		// java
 		new InlineConfigSerializer<String>("java", String.class, (n)->new JsonPrimitive(n), (js)->js.getAsString(), StringArgumentType.greedyString(), String.class);
 		new InlineConfigSerializer<Character>("java", Character.class, (n)->new JsonPrimitive(n), (js)->js.getAsString().toCharArray()[0], StringArgumentType.greedyString(), String.class, (s)->s.charAt(0));
@@ -264,8 +304,6 @@ public class Config {
 		}
 		return bestSerializer;
 	}
-	
-	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
 	public static final String CONFIG_DIRECTORY = FabricLoader.getInstance().getConfigDir().toFile().getAbsolutePath()+File.separatorChar;
 	

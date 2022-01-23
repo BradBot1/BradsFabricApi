@@ -1,5 +1,22 @@
 # BFAPI
 
+## Recipes
+
+BFAPI has support for complex recipes making customising a server easier
+
+### Recipe types
+
+These are used to identify what type of recipe you want to make
+
+|Type|Identifier|
+|Shapeless Crafting|minecraft:shapeless_crafting|
+
+### Recipe results
+
+Recipes can have custom 'results' that are given to the player after they craft an item, for example xp can be given
+
+
+
 ## Events
 
 Events have been changed to make them more modular, now all events must be registered and have an identifier
@@ -98,6 +115,33 @@ public class ExampleListener implements EventListener {
 }
 ```
 
+#### Reference handling with decomposition
+
+If you want a simpler approach to dealing with inputs then you can have an events input decomposed into the inner arguments
+
+Here I will still be using [the event created in a prior example](#creating-an-event-an-example)
+
+```java
+public class ExampleListener implements EventListener {
+	
+	public ExampleListener() {
+		// Here we auto register all events
+		// Doing it in the constructor removes complexity
+		register();
+	}
+	
+	// We use an annotation to say what event to bind to
+	// The event must be on the BFAPIRegistry#EVENTS registry
+	@EventHandler(eventIdentifier = "MODID:message", decomposeArguments = true)
+	public void handleMessageEvent(String message) {
+		// You can handle the event like normal here
+		// However you will notice that we now have decomposed/direct access to the inputs inner values
+		// this can make your code look cleaner when handling events
+	}
+	
+}
+```
+
 ##### Controlling event binding
 
 By default an event is not required, if it isn't bound to then it nothing will happen other than a simple log to console
@@ -111,6 +155,8 @@ You can modify this behaviour in the `EventHandler` annotation as it has a few f
 |logOnFailedBinding|Boolean|If a message should be logged when the event fails to bind|true|
 
 ### 'Out of the box' events
+
+> THIS IS OUT OF DATE, I have added alot of events since then and plan to update this documentation soon, however, I might move to githubs wiki feature for this
 
 #### Minecraft events
 

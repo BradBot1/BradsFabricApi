@@ -23,7 +23,7 @@ import net.minecraft.nbt.NbtFloat;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtLong;
-import net.minecraft.nbt.NbtNull;
+import net.minecraft.nbt.NbtEnd;
 import net.minecraft.nbt.NbtShort;
 import net.minecraft.nbt.NbtString;
 
@@ -47,7 +47,7 @@ public final class NbtUtils {
 		byte type = nbtElement.getType();
 		JsonObject jsonObject;
 		switch (type) {
-		case NbtElement.NULL_TYPE: return JsonNull.INSTANCE;
+		case NbtElement.END_TYPE: return JsonNull.INSTANCE;
 		case NbtElement.COMPOUND_TYPE:
 			jsonObject = new JsonObject();
 			NbtCompound nbtCompound = ((NbtCompound)nbtElement);
@@ -80,7 +80,7 @@ public final class NbtUtils {
 	}
 	
 	public static @NotNull NbtElement deserialize(@Nullable JsonElement jsonElement) {
-		if (jsonElement==null) return NbtNull.INSTANCE;
+		if (jsonElement==null) return NbtEnd.INSTANCE;
 		if (jsonElement.isJsonArray()) {
 			NbtList nbtList = new NbtList();
 			for (JsonElement jsonElement2 : jsonElement.getAsJsonArray()) {
@@ -116,7 +116,7 @@ public final class NbtUtils {
 				}
 			}
 		}
-		return NbtNull.INSTANCE;
+		return NbtEnd.INSTANCE;
 	}
 	
 }
