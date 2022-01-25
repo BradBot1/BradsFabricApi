@@ -15,6 +15,8 @@ import com.bb1.fabric.bfapi.permissions.PermissionConfig;
 import com.bb1.fabric.bfapi.permissions.database.SimplePermissionDatabase;
 import com.bb1.fabric.bfapi.recipe.AbstractRecipe;
 import com.bb1.fabric.bfapi.recipe.RecipeLoader;
+import com.bb1.fabric.bfapi.screen.Screen;
+import com.bb1.fabric.bfapi.screen.chest.BorderedChestScreen;
 import com.bb1.fabric.bfapi.timings.IScheduler;
 import com.bb1.fabric.bfapi.timings.ThreadedScheduler;
 import com.bb1.fabric.bfapi.utils.Container;
@@ -25,6 +27,10 @@ import com.bb1.fabric.bfapi.utils.Inputs.QuintInput;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -63,6 +69,14 @@ public class Loader implements ModInitializer {
 		setupMarkHandling();
 		RecipeLoader.loadRecipes();
 		LOADER_LOADED.emit(Input.of(this));
+		Screen screen = new BorderedChestScreen(4, Items.DARK_OAK_BOAT.getDefaultStack());
+		NamedScreenHandlerFactory factory = screen.toNamedScreenHandlerFactory(new LiteralText("test!!"));
+		GameObjects.GameEvents.COMMAND_REGISTRATION.addHandler((i)->{
+			i.get().register(CommandManager.literal("test").executes((s)->{
+				s.getSource().getPlayer().openHandledScreen(factory);
+				return 1;
+			}));
+		});
 	}
 	
 	private void setupMarkHandling() {
