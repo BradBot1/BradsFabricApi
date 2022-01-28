@@ -14,12 +14,12 @@ public class PermissionConfig extends Config {
 		super(new Identifier(ID, "permissions"));
 	}
 	
-	@ConfigComment(contents = "If the default permission handler should be registered, you may want to turn this off if you have a different handler registered")
-	@ConfigName(name = "EnableDefaultPermissionHandler")
+	@ConfigComment("If the default permission handler should be registered, you may want to turn this off if you have a different handler registered")
+	@ConfigName("EnableDefaultPermissionHandler")
 	public boolean enabled;
 	
-	@ConfigComment(contents = "The path the default permission handler should be registered under, should only use a-z0-9")
-	@ConfigName(name = "DefaultPermissionHandlerID")
+	@ConfigComment("The path the default permission handler should be registered under, should only use a-z0-9")
+	@ConfigName("DefaultPermissionHandlerID")
 	public String dbName = "default_handler";
 
 }

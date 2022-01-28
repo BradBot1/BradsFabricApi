@@ -11,6 +11,9 @@ import java.lang.annotation.Target;
 @Target({ FIELD, ElementType.LOCAL_VARIABLE })
 public @interface ConfigSub{
 	
-	public String subOf();
+	public String value() default "";
+	
+	@Deprecated
+	public String subOf() default "";
 	
 }

@@ -68,6 +68,7 @@ public class Config {
 	
 	private static boolean LOADED = false;
 	
+	@SuppressWarnings("deprecation")
 	public static synchronized final void init() {
 		if (LOADED) { return; }
 		// api stuff
@@ -153,7 +154,7 @@ public class Config {
 				JsonObject current = jsonObject;
 				if (field.isAnnotationPresent(ConfigSub.class)) {
 					final ConfigSub sub = field.getAnnotation(ConfigSub.class);
-					String[] path = sub.subOf().split("\\.");
+					String[] path = sub.value().equals("") ? sub.subOf().split("\\.") : sub.value().split("\\.");
 					JsonObject prev = jsonObject;
 					for (String str : path) {
 						current = prev.has(str) ? prev.get(str).getAsJsonObject() : new JsonObject();
@@ -163,9 +164,14 @@ public class Config {
 				}
 				if (field.isAnnotationPresent(ConfigComment.class)) {
 					final ConfigComment comment = field.getAnnotation(ConfigComment.class);
-					current.addProperty(comment.prefix()+field.getName(), comment.contents());
+					current.addProperty(comment.prefix()+field.getName(), comment.value().equals("")?comment.contents():comment.value());
 				}
-				current.add(field.isAnnotationPresent(ConfigName.class) ? field.getAnnotation(ConfigName.class).name() : field.getName(), ExceptionWrapper.executeWithReturn(TriInput.of(method, ser, com.bb1.fabric.bfapi.utils.Field.of(instance)), SERIALIZER_INVOKER));
+				String name = field.getName();
+				if (field.isAnnotationPresent(ConfigName.class)) {
+					ConfigName nme = field.getAnnotation(ConfigName.class);
+					name = nme.value().equals("") ? nme.name() : nme.value();
+				}
+				current.add(name, ExceptionWrapper.executeWithReturn(TriInput.of(method, ser, com.bb1.fabric.bfapi.utils.Field.of(instance)), SERIALIZER_INVOKER));
 			}
 			return jsonObject;
 		}, (js)->{
@@ -185,7 +191,7 @@ public class Config {
 					JsonObject current = jsonObject;
 					if (field.isAnnotationPresent(ConfigSub.class)) {
 						final ConfigSub sub = field.getAnnotation(ConfigSub.class);
-						String[] path = sub.subOf().split("\\.");
+						String[] path = sub.value().equals("") ? sub.subOf().split("\\.") : sub.value().split("\\.");
 						JsonObject prev = jsonObject;
 						for (String str : path) {
 							current = prev.has(str) ? prev.get(str).getAsJsonObject() : new JsonObject();
@@ -193,7 +199,12 @@ public class Config {
 							prev = current;
 						}
 					}
-					JsonElement instance = current.get(field.isAnnotationPresent(ConfigName.class) ? field.getAnnotation(ConfigName.class).name() : field.getName());
+					String name = field.getName();
+					if (field.isAnnotationPresent(ConfigName.class)) {
+						ConfigName nme = field.getAnnotation(ConfigName.class);
+						name = nme.value().equals("") ? nme.name() : nme.value();
+					}
+					JsonElement instance = current.get(name);
 					if (instance==null) {
 						LOGGER.fatal("Unable to instantiate record as a field could not be found!");
 						throw new NullPointerException("Instance cannot be null!");
@@ -340,6 +351,7 @@ public class Config {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	private final void buildCommand(@NotNull CommandDispatcher<ServerCommandSource> dispatcher) {
 		CommandNode<ServerCommandSource> cmd = dispatcher.getRoot().getChild("config");
 		if (cmd==null) {
@@ -353,7 +365,12 @@ public class Config {
 		CommandNode<ServerCommandSource> subSubCmd = CommandManager.literal(this.identifier.getPath()).build();
 		for (Field field : getClass().getDeclaredFields()) {
 			if (field.isAnnotationPresent(ConfigIgnore.class) || field.getDeclaringClass().isAnnotationPresent(ConfigIgnore.class) || Modifier.isStatic(field.getModifiers())|| Modifier.isFinal(field.getModifiers())) { continue; }
-			final String fieldName = field.isAnnotationPresent(ConfigName.class) ? field.getAnnotation(ConfigName.class).name() : field.getName();
+			String name = field.getName();
+			if (field.isAnnotationPresent(ConfigName.class)) {
+				ConfigName nme = field.getAnnotation(ConfigName.class);
+				name = nme.value().equals("") ? nme.name() : nme.value();
+			}
+			final String fieldName = name;
 			final LiteralArgumentBuilder<ServerCommandSource> innerCmd = CommandManager.literal(fieldName);
 			innerCmd.then(CommandManager.literal("get")
 					.executes((cs)->{
@@ -371,6 +388,7 @@ public class Config {
 		subCmd.addChild(subSubCmd);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void save() {
 		JsonObject jsonObject = new JsonObject();
 		final Method method = ExceptionWrapper.executeWithReturn(null, SERIALIZER_GRABBER);
@@ -390,7 +408,7 @@ public class Config {
 			JsonObject current = jsonObject;
 			if (field.isAnnotationPresent(ConfigSub.class)) {
 				final ConfigSub sub = field.getAnnotation(ConfigSub.class);
-				String[] path = sub.subOf().split("\\.");
+				String[] path = sub.value().equals("") ? sub.subOf().split("\\.") : sub.value().split("\\.");
 				JsonObject prev = jsonObject;
 				for (String str : path) {
 					current = prev.has(str) ? prev.get(str).getAsJsonObject() : new JsonObject();
@@ -400,9 +418,14 @@ public class Config {
 			}
 			if (field.isAnnotationPresent(ConfigComment.class)) {
 				final ConfigComment comment = field.getAnnotation(ConfigComment.class);
-				current.addProperty(comment.prefix()+field.getName(), comment.contents());
+				current.addProperty(comment.prefix()+field.getName(), comment.value().equals("")?comment.contents():comment.value());
 			}
-			current.add(field.isAnnotationPresent(ConfigName.class) ? field.getAnnotation(ConfigName.class).name() : field.getName(), ExceptionWrapper.executeWithReturn(TriInput.of(method, ser, com.bb1.fabric.bfapi.utils.Field.of(instance)), SERIALIZER_INVOKER));
+			String name = field.getName();
+			if (field.isAnnotationPresent(ConfigName.class)) {
+				ConfigName nme = field.getAnnotation(ConfigName.class);
+				name = nme.value().equals("") ? nme.name() : nme.value();
+			}
+			current.add(name, ExceptionWrapper.executeWithReturn(TriInput.of(method, ser, com.bb1.fabric.bfapi.utils.Field.of(instance)), SERIALIZER_INVOKER));
 		}
 		try {
 			new File(CONFIG_DIRECTORY+this.identifier.getNamespace()+File.separatorChar).mkdirs();
@@ -418,6 +441,7 @@ public class Config {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void load() {
 		File file = new File(CONFIG_DIRECTORY+this.identifier.getNamespace()+File.separatorChar+this.identifier.getPath()+".json");
 		if (!file.exists()) return; // Can't load anything if there is file
@@ -446,7 +470,7 @@ public class Config {
 			JsonObject current = jsonObject;
 			if (field.isAnnotationPresent(ConfigSub.class)) {
 				final ConfigSub sub = field.getAnnotation(ConfigSub.class);
-				String[] path = sub.subOf().split("\\.");
+				String[] path = sub.value().equals("") ? sub.subOf().split("\\.") : sub.value().split("\\.");
 				JsonObject prev = jsonObject;
 				for (String str : path) {
 					current = prev.has(str) ? prev.get(str).getAsJsonObject() : new JsonObject();
@@ -454,7 +478,12 @@ public class Config {
 					prev = current;
 				}
 			}
-			JsonElement instance = current.get(field.isAnnotationPresent(ConfigName.class) ? field.getAnnotation(ConfigName.class).name() : field.getName());
+			String name = field.getName();
+			if (field.isAnnotationPresent(ConfigName.class)) {
+				ConfigName nme = field.getAnnotation(ConfigName.class);
+				name = nme.value().equals("") ? nme.name() : nme.value();
+			}
+			JsonElement instance = current.get(name);
 			if (instance==null) {
 				LOGGER.warn("Failed to load the field "+field.getName()+" of "+this.identifier.toString());
 				continue;

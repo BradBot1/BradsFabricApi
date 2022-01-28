@@ -11,6 +11,9 @@ import java.lang.annotation.Target;
 @Target({ FIELD, ElementType.LOCAL_VARIABLE })
 public @interface ConfigName{
 	
-	public String name();
+	public String value() default "";
+	
+	@Deprecated
+	public String name() default "";
 	
 }

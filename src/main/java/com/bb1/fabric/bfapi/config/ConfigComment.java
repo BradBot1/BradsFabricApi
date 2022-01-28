@@ -11,8 +11,15 @@ import java.lang.annotation.Target;
 @Target({ FIELD, ElementType.LOCAL_VARIABLE })
 public @interface ConfigComment{
 	
-	public String prefix() default "comment-";
+	public String value() default "";
+	/**
+	 * use {@link #value()}
+	 * 
+	 * this will only be checked is value() is not set
+	 */
+	@Deprecated
+	public String contents() default "No comment set";
 	
-	public String contents();
+	public String prefix() default "comment-";
 	
 }

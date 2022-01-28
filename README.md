@@ -173,3 +173,18 @@ You can modify this behaviour in the `EventHandler` annotation as it has a few f
 |Event|Description|Identifer|Gives|
 |-----|-----------|---------|-----|
 |LoadedEvent|Called when BFAPI is finished loading|bfapi:loaded|Input\<Loader\>|
+
+## DEPRECATION NOTICE
+
+#### Simply
+
+Any field/method/class marked by the `@Deprecated` annotation will be removed after a month (*roughly*)
+
+#### Also
+
+This is alongside any helper functions that utilise it
+
+For example if a helper function takes in a depricated object as an argument it may be removed without being marked itself as it relies upon something that no longer exists. The method may not be marked itself
+
+**If a class/method no longer works as intended and cannot be repaired it may be removed without a deprecation notice**
+
