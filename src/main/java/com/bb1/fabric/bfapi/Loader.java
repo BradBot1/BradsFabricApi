@@ -61,8 +61,14 @@ public class Loader implements ModInitializer {
 		AbstractRecipe.init();
 		loadPermissions();
 		setupMarkHandling();
-		RecipeLoader.loadRecipes();
+		loadRecipes();
 		LOADER_LOADED.emit(Input.of(this));
+	}
+	
+	private void loadRecipes() {
+		GameObjects.GameEvents.SERVER_START.addHandler((s)->{
+			RecipeLoader.loadRecipes();
+		});
 	}
 	
 	private void setupMarkHandling() {
