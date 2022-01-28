@@ -13,7 +13,7 @@ public final class Constants {
 	
 	public static final String ID = "bfapi";
 	
-	public static final String VERSION = "1.2.2";
+	public static final String VERSION = "1.3.0";
 	
 	public static final String PATH = "com.bb1.fabric";
 	

@@ -13,7 +13,8 @@
  	"MarkableEntityMixin",
  	"EntityHitMixin",
  	"ItemStackUseMixin",
- 	"RecipeRestrictionMixin"
+ 	"RecipeRestrictionMixin",
+ 	"SlotMixin"
  ],
   "client": [],
   "injectors": {
