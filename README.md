@@ -9,13 +9,117 @@ BFAPI has support for complex recipes making customising a server easier
 These are used to identify what type of recipe you want to make
 
 |Type|Identifier|
+|----|----------|
 |Shapeless Crafting|minecraft:shapeless_crafting|
+|Shaped Crafting|minecraft:shaped_crafting|
 
 ### Recipe results
 
 Recipes can have custom 'results' that are given to the player after they craft an item, for example xp can be given
 
+|Result ID|Description|Expects|
+|---------|-----------|-------|
+|xp|Gives the player the amount of xp levels specified|Integer|
+|run|A json object with two keys, server and player. Server is a JsonArray of commands the server should execute. Player is a JsonArray of commands the player should run|JsonObject|
+|advancements|A list of advancements identifiers to be awarded|JsonArray|
+|permissions|A list of permissions to be awarded|JsonArray|
+|items|A list of items to be given to the player|JsonArray|
+|messages|A list of Text to be sent to the player|JsonArray|
 
+### Recipe requirements
+
+Recipes can have a plethora of requirements that are used to resrict access to a recipe
+
+|Requirement ID|Description|Expects|
+|xp|Ensures the player has the amount of xp levels specified|Integer|
+|advancements|Ensures the player has the advancements specified|JsonArray|
+|permissions|Ensures the player has the permissions specified|JsonArray|
+
+### Interacting with recipes and adding custom requirements/features/types
+
+Adding custom requirements/features/types to recipes is simpler then it sounds, there are simple interfaces and methods that you can utilise to make it easier
+
+#### Adding a requirement for recipes to use
+
+Adding recipe requirements is very easy
+
+To add a requirement you will need to use the `addRequirementBuilder` method on `AbstractRecipe`
+
+```java
+AbstractRecipe.addRequirementBuilder(); // like this!
+```
+
+The `addRequirementBuilder` method takes two inputs, an id in the form of a string and an IRecipeRequirement
+
+##### Example of adding a requirement to recipes
+
+Here we are going to add a requirement that ensures the player has a specified amount of health
+
+```java
+AbstractRecipe.addRequirementBuilder("healthRequirement", (jsonElement)->{
+	final int amount = jsonElement.getAsInt(); // we get the amount specified in the json here
+	return new IRecipeRequirement() { // we build an instance of IRecipeRequirement
+
+		@Override
+		public boolean canCraft(Field<Entity> crafter) { // this method controls if the player can craft the item
+			return crafter.getObject().getHealth() >= amount; // we are checking the the given entity has the health required to craft the item
+		}
+
+		@Override
+		public JsonObject addToObject(JsonObject object) { // here we build a serializer to allow for saving to json if the requirement is used in a recipe in a config
+			object.addProperty("healthRequirement", amount); // the id here should be the same as the one used in the `addRequirementBuilder` method
+			return object; // we need to return the object
+		}
+		
+	};
+});
+```
+
+#### Adding a result for recipes to use
+
+Adding recipe result is as easy as a requirement
+
+To add a requirement you will need to use the `addResultBuilder` method on `AbstractRecipe`
+
+```java
+AbstractRecipe.addResultBuilder(); // like this!
+```
+
+The `addResultBuilder` method takes two inputs, an id in the form of a string and an IRecipeResult
+
+##### Example of adding a result to recipes
+
+Here we are going to add a result that kicks the player
+
+```java
+AbstractRecipe.addResultBuilder("kick", (jsonElement)->{
+	final String message = jsonElement.getAsString(); // we get the kick reason specified in the json here
+	return new IRecipeResult() {
+
+		@Override
+		public void onCraft(Field<Entity> crafter) {
+			if (crafter.getObject() instanceof PlayerEntity pe) { // we ensure the crafter is a player
+				pr.networkConnection.disconnect(new LiteralText(message)); // we kick them with the message provided
+			}
+		}
+
+		@Override
+		public JsonObject addToObject(JsonObject object) {
+			object.add("kick", message); // like in IRecipeResult this should be the same id as used in addResultBuilder
+			return object;
+		}
+		
+	};
+});
+```
+
+#### Adding a recipe type
+
+Unlike adding requirements and results this takes alot to do
+
+First of you need a working implementation of `AbstractRecipe` that builds to the wanted recipe (*you can look at [the source](https://github.com/BradBot1/BradsFabricApi/blob/master/src/main/java/com/bb1/fabric/bfapi/recipe/ShapelessCraftingRecipe.java) for a better example of this*)
+
+Then you just need to register it with the `addRecipeBuilder` on `AbstractRecipe`
 
 ## Events
 

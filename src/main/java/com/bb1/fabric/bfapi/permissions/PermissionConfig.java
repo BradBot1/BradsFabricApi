@@ -16,7 +16,7 @@ public class PermissionConfig extends Config {
 	
 	@ConfigComment("If the default permission handler should be registered, you may want to turn this off if you have a different handler registered")
 	@ConfigName("EnableDefaultPermissionHandler")
-	public boolean enabled;
+	public boolean enabled = true;
 	
 	@ConfigComment("The path the default permission handler should be registered under, should only use a-z0-9")
 	@ConfigName("DefaultPermissionHandlerID")

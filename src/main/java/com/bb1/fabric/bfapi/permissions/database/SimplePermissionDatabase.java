@@ -38,6 +38,7 @@ public class SimplePermissionDatabase implements IPermissionDatabase {
 	
 	public SimplePermissionDatabase(Identifier id) {
 		this.id = id;
+		new File(SAVE_PATH+id.getNamespace()+File.separatorChar).mkdirs();
 		File file = new File(SAVE_PATH+id.getNamespace()+File.separatorChar+id.getNamespace()+".dat");
 		if (file.exists()) {
 			ExceptionWrapper.execute(Input.of(this._permissions), (i)->{
@@ -61,8 +62,8 @@ public class SimplePermissionDatabase implements IPermissionDatabase {
 					}
 					main.put(entry.getKey().toString(), inner);
 				}
+				new File(SAVE_PATH+id.getNamespace()+File.separatorChar).mkdirs();
 				File file2 = new File(SAVE_PATH+id.getNamespace()+File.separatorChar+id.getNamespace()+".dat");
-				file2.mkdirs();
 				file2.createNewFile();
 				NbtIo.writeCompressed(main, file2);
 			});
