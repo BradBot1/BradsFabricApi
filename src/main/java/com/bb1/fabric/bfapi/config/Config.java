@@ -1,7 +1,6 @@
 package com.bb1.fabric.bfapi.config;
 
 import static com.bb1.fabric.bfapi.Constants.GSON;
-import static com.bb1.fabric.bfapi.Constants.ID;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -62,7 +61,10 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
+
+import static com.bb1.fabric.bfapi.Constants.ID;
 
 public class Config {
 	
@@ -223,7 +225,24 @@ public class Config {
 		new InlineConfigSerializer<Text>("minecraft", Text.class, (n)->Text.Serializer.toJsonTree(n), (js)->Text.Serializer.fromJson(js), TextArgumentType.text(), Text.class);
 		new InlineConfigSerializer<Identifier>("minecraft", Identifier.class, (n)->new JsonPrimitive(n.toString()), (js)->new Identifier(js.getAsString()), IdentifierArgumentType.identifier(), Identifier.class);
 		new InlineConfigSerializer<NbtElement>("minecraft", NbtElement.class, (n)->NbtUtils.serialize(n), (js)->NbtUtils.deserialize(js));
-		new InlineConfigSerializer<ItemStack>("minecraft", ItemStack.class, (n)->NbtUtils.serialize(n.writeNbt(new NbtCompound())), (js)->ItemStack.fromNbt((NbtCompound)NbtUtils.deserialize(js)), ItemStackArgumentType.itemStack(), ItemStackArgument.class, (isa)->ExceptionWrapper.executeWithReturn((v)->isa.createStack(1, true)));
+		// new InlineConfigSerializer<ItemStack>("minecraft", ItemStack.class, (n)->NbtUtils.serialize(n.writeNbt(new NbtCompound())), (js)->ItemStack.fromNbt((NbtCompound)NbtUtils.deserialize(js)), ItemStackArgumentType.itemStack(), ItemStackArgument.class, (isa)->ExceptionWrapper.executeWithReturn((v)->isa.createStack(1, true)));
+		new InlineConfigSerializer<ItemStack>("minecraft", ItemStack.class, (n)->{
+			JsonObject js = new JsonObject();
+			js.addProperty("id", Registry.ITEM.getId(n.getItem()).toString());
+			js.addProperty("Count", n.getCount());
+			if (n.hasNbt()) {
+	            js.add("tag", NbtUtils.serialize(n.getNbt()));
+	        }
+			return js;
+		}, (js)->{
+			final JsonObject j = js.getAsJsonObject();
+			ItemStack is = Registry.ITEM.get(new Identifier(j.get("id").getAsString())).getDefaultStack();
+			is.setCount(j.has("Count") ? j.get("Count").getAsInt() : 1);
+			if (j.has("tag")) {
+				is.setNbt((NbtCompound) NbtUtils.deserialize(j.get("tag")));
+			}
+			return is;
+		}, ItemStackArgumentType.itemStack(), ItemStackArgument.class, (isa)->ExceptionWrapper.executeWithReturn((v)->isa.createStack(1, true)));
 		// gson
 		new InlineConfigSerializer<JsonObject>("gson", JsonObject.class, (n)->n, (js)->js.getAsJsonObject());
 		new InlineConfigSerializer<JsonArray>("gson", JsonArray.class, (n)->n, (js)->js.getAsJsonArray());
