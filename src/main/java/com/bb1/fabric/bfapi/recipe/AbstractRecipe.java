@@ -31,6 +31,7 @@ import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 /**
  * 
@@ -384,7 +385,7 @@ public abstract class AbstractRecipe implements IRegisterable {
 	
 	protected AbstractRecipe(@Nullable ItemStack resultIcon, @Nullable String group) {
 		this.resultIcon = resultIcon==null||resultIcon.isEmpty() ? Items.BARRIER.getDefaultStack() : resultIcon;
-		this.group = group;
+		this.group = group==null ? Registry.ITEM.getId(resultIcon.getItem()).toUnderscoreSeparatedString() : group;
 	}
 	
 	public void addResult(@NotNull IRecipeResult result, @Nullable IRecipeResult... results) {

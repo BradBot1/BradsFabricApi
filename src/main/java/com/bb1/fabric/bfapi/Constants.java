@@ -21,7 +21,7 @@ public final class Constants {
 	
 	public static final Logger LOGGER = LogManager.getLogger(ID);
 	
-	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 	
 	public static final Logger createSubLogger(@NotNull String name) {
 		return LogManager.getLogger(ID+" | "+name);

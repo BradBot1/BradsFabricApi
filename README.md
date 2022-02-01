@@ -31,6 +31,7 @@ Recipes can have custom 'results' that are given to the player after they craft 
 Recipes can have a plethora of requirements that are used to resrict access to a recipe
 
 |Requirement ID|Description|Expects|
+|--------------|-----------|-------|
 |xp|Ensures the player has the amount of xp levels specified|Integer|
 |advancements|Ensures the player has the advancements specified|JsonArray|
 |permissions|Ensures the player has the permissions specified|JsonArray|

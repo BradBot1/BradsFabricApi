@@ -22,28 +22,16 @@ public enum PermissionLevel {
 	
 	@Override
 	public String toString() {
-		return name().toLowerCase().replaceAll("_", " level ");
+		return name().toLowerCase();
 	}
 	
 	public static PermissionLevel fromString(String s) {
-		switch(s.toLowerCase().replaceAll(" ", "").replaceAll("level", "_").replaceAll("op", "_")) {
-		case "1":
-		case "one":
-			return OP_1;
-		case "2":
-		case "two":
-			return OP_2;
-		case "3":
-		case "three":
-			return OP_3;
-		case "4":
-		case "four":
-			return OP_4;
-		case "node":
-			return NODE;
-		default :
-			return DEFAULT;
+		for (PermissionLevel lvl : values()) {
+			if (lvl.toString().equals(s)) {
+				return lvl;
+			}
 		}
+		return NODE;
 	}
 	
 }

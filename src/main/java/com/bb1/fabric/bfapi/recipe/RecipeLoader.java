@@ -7,12 +7,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import com.bb1.fabric.bfapi.Constants;
 import com.bb1.fabric.bfapi.config.AbstractConfigSerializable;
@@ -29,7 +33,13 @@ public final class RecipeLoader {
 	
 	public static final String RECIPE_DIRECTORY = FabricLoader.getInstance().getGameDir().toFile().getAbsolutePath()+File.separatorChar+"recipes"+File.separatorChar;
 	
+	private static final Map<Identifier, AbstractRecipe> DEFAULT_RECIPES = new HashMap<Identifier, AbstractRecipe>();
+	
 	private static final Logger LOGGER = Constants.createSubLogger("RecipeLoader");
+	
+	public static final void addDefaultRecipe(@NotNull Identifier identifier, @NotNull AbstractRecipe recipe) {
+		DEFAULT_RECIPES.put(identifier, recipe);
+	}
 	
 	public static final List<AbstractRecipe> loadRecipes() {
 		final List<AbstractRecipe> recipes = new LinkedList<AbstractRecipe>();
@@ -55,7 +65,13 @@ public final class RecipeLoader {
 				AbstractRecipe recipe = ser.deserialize(Field.of(js.get("recipe")));
 				recipe.register(id);
 				recipes.add(recipe);
+				DEFAULT_RECIPES.remove(id); // remove default as its loaded
 			}
+		}
+		for (Entry<Identifier, AbstractRecipe> recipe : DEFAULT_RECIPES.entrySet()) {
+			recipe.getValue().register(recipe.getKey());
+			saveRecipe(recipe.getKey(), recipe.getValue(), recipe.getKey().toUnderscoreSeparatedString());
+			recipes.add(recipe.getValue());
 		}
 		LOGGER.info("Loaded " + recipes.size() + " recipes");
 		return recipes;

@@ -355,7 +355,7 @@ public class Config {
 	private final void buildCommand(@NotNull CommandDispatcher<ServerCommandSource> dispatcher) {
 		CommandNode<ServerCommandSource> cmd = dispatcher.getRoot().getChild("config");
 		if (cmd==null) {
-			cmd = dispatcher.register(CommandManager.literal("config"));
+			cmd = dispatcher.register(CommandManager.literal("config").requires((s)->s.getEntity()==null||s.hasPermissionLevel(4)));
 		}
 		CommandNode<ServerCommandSource> subCmd = cmd.getChild(this.identifier.getNamespace());
 		if (subCmd==null) {
@@ -397,7 +397,9 @@ public class Config {
 			if (field.isAnnotationPresent(ConfigIgnore.class) || field.getDeclaringClass().isAnnotationPresent(ConfigIgnore.class) || Modifier.isStatic(field.getModifiers())|| Modifier.isFinal(field.getModifiers())) { continue; }
 			final Object instance = ExceptionWrapper.executeWithReturn(DualInput.of(field, this), (i)->i.get().get(i.getSecond()));
 			if (instance==null) {
-				LOGGER.warn("Failed to save the field "+field.getName()+" of "+this.identifier.toString());
+				if (!field.isAnnotationPresent(ConfigNullable.class)) { // if marked nullable they obviously know it can be null/not set
+					LOGGER.warn("Failed to save the field "+field.getName()+" of "+this.identifier.toString());
+				}
 				continue;
 			}
 			final AbstractConfigSerializable<?> ser = getSerializer(field.getType(), true);
@@ -485,7 +487,9 @@ public class Config {
 			}
 			JsonElement instance = current.get(name);
 			if (instance==null) {
-				LOGGER.warn("Failed to load the field "+field.getName()+" of "+this.identifier.toString());
+				if (!field.isAnnotationPresent(ConfigNullable.class)) {
+					LOGGER.warn("Failed to load the field "+field.getName()+" of "+this.identifier.toString());
+				}
 				continue;
 			}
 			AbstractConfigSerializable<?> ser = getSerializer(field.getType(), true);
