@@ -293,3 +293,8 @@ For example if a helper function takes in a depricated object as an argument it 
 
 **If a class/method no longer works as intended and cannot be repaired it may be removed without a deprecation notice**
 
+## Links
+
+* [GitHub](https://github.com/BradBot1/LifeSteal)
+* [ModRinth](https://modrinth.com/mod/lifesteal)
+* [CurseForge](https://www.curseforge.com/minecraft/mc-mods/lifesteal)
