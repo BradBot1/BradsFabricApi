@@ -37,6 +37,7 @@ public class ItemStackUseMixin {
 			callback.setReturnValue(TypedActionResult.fail(is));
 			callback.cancel();
 		}
+		// TODO: move to MarkableItemMixin
 		// We can reuse the container as it has to be false to get here
 		Loader.MARK_ITEM_USED.emit(QuintInput.of(is, world, null, Field.of(user), container));
 		if (container.getValue()) {
@@ -54,6 +55,7 @@ public class ItemStackUseMixin {
 			callback.setReturnValue(ActionResult.FAIL);
 			callback.cancel();
 		}
+		// TODO: move to MarkableItemMixin
 		// We can reuse the container as it has to be false to get here
 		Loader.MARK_ITEM_USED.emit(QuintInput.of(is, context.getWorld(), context.getBlockPos(), Field.of(context.getPlayer()), container));
 		if (container.getValue()) {
