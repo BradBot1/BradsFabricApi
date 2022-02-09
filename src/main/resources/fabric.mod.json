@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "bfapi",
-  "version": "1.2.1",
+  "version": "${version}",
 
   "name": "BFAPI",
   "description": "A funky api",
@@ -15,7 +15,7 @@
   },
 
   "license": "Apache License v2",
-  "icon": "assets/${id}/icon.png",
+  "icon": "assets/bfapi/icon.png",
 
   "environment": "*",
   "entrypoints": {
