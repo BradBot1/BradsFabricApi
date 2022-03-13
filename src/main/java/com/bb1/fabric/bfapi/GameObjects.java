@@ -1,5 +1,9 @@
 package com.bb1.fabric.bfapi;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Consumer;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +26,12 @@ public final class GameObjects {
 	
 	private static MinecraftServer minecraftServer;
 	
-	public static void setMinecraftServer(@NotNull MinecraftServer server) { minecraftServer = server; }
+	public static void setMinecraftServer(@NotNull MinecraftServer server) {
+		minecraftServer = server;
+		for (Consumer<MinecraftServer> consumer : Helpers.RUN_AFTER_GAME_LOAD) {
+			consumer.accept(server);
+		}
+	}
 	
 	public static @Nullable MinecraftServer getMinecraftServer() { return minecraftServer; }
 	
@@ -31,6 +40,17 @@ public final class GameObjects {
 	public static void setCommandManager(net.minecraft.server.command.CommandManager commandManager2) { commandManager = commandManager2; }
 	
 	public static net.minecraft.server.command.CommandManager getCommandManager() { return commandManager; }
+	
+	public static final class Helpers {
+		
+		private static final Set<Consumer<MinecraftServer>> RUN_AFTER_GAME_LOAD = new HashSet<Consumer<MinecraftServer>>();
+		
+		public static void runWhenServerStart(Consumer<MinecraftServer> consumer) {
+			RUN_AFTER_GAME_LOAD.add(consumer);
+			if (minecraftServer!=null) consumer.accept(minecraftServer);
+		}
+		
+	}
 	
 	
 	public static final class GameEvents {
@@ -41,6 +61,7 @@ public final class GameObjects {
 		
 		public static final Event<Input<MinecraftServer>> SERVER_STOP = new Event<Input<MinecraftServer>>("minecraft:server_stop");
 		
+		//IMP: add client side/server side versions that call this, allowing for more modularity n stuffs
 		public static final Event<Input<CommandDispatcher<ServerCommandSource>>> COMMAND_REGISTRATION = new Event<Input<CommandDispatcher<ServerCommandSource>>>("minecraft:command_registration");
 		
 		public static final Event<Input<Void>> SERVER_RELOAD = new Event<Input<Void>>("minecraft:server_reload");
