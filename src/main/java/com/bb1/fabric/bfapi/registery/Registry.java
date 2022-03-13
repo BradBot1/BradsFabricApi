@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,7 @@ import com.bb1.fabric.bfapi.nbt.mark.INbtMarkListener;
 import com.bb1.fabric.bfapi.permissions.Permission;
 import com.bb1.fabric.bfapi.permissions.database.IPermissionDatabase;
 import com.bb1.fabric.bfapi.recipe.AbstractRecipe;
+import com.bb1.fabric.bfapi.text.parser.TextParserLookup;
 import com.bb1.fabric.bfapi.utils.ExceptionWrapper;
 import com.bb1.fabric.bfapi.utils.Inputs.DualInput;
 import com.bb1.fabric.bfapi.utils.Inputs.TriInput;
@@ -32,12 +34,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.GameRules.Type;
 
-public class BFAPIRegistry<T> extends SimpleRegistry<T> {
+public class Registry<T> {
 	
 	public static final BFAPIRegistry<INbtMarkListener> MARK_LISTENER = new BFAPIRegistry<INbtMarkListener>("mark_listeners");
 	public static final BFAPIRegistry<Event<?>> EVENTS = new BFAPIRegistry<Event<?>>("events");
@@ -51,7 +53,7 @@ public class BFAPIRegistry<T> extends SimpleRegistry<T> {
 		return true;
 	});
 	public static final BFAPIRegistry<AbstractConfigSerializable<?>> CONFIG_SERIALIZER = new BFAPIRegistry<AbstractConfigSerializable<?>>("config_serializers", (i)->{
-		return BFAPIRegistry.CONFIG_SERIALIZER.getEntries().stream().filter((config)->config.getValue().getSerializableClass().equals(i.getSecond().getClass())).toList().size()<=0;
+		return BFAPIRegistry.CONFIG_SERIALIZER.getEntrySet().stream().filter((config)->config.getValue().getSerializableClass().equals(i.getSecond().getClass())).toList().size()<=0;
 	});
 	public static final BFAPIRegistry<Permission> PERMISSIONS = new BFAPIRegistry<Permission>("permissions");
 	public static final BFAPIRegistry<IPermissionDatabase> PERMISSION_DATABASES = new BFAPIRegistry<IPermissionDatabase>("permission_databases");
@@ -85,30 +87,30 @@ public class BFAPIRegistry<T> extends SimpleRegistry<T> {
 		GameObjects.getMinecraftServer().getRecipeManager().setRecipes(recipes);
 		return true;
 	});
+	public static final BFAPIRegistry<TextParserLookup> TEXT_PARSER_LOOKUPS = new BFAPIRegistry<TextParserLookup>("text_parser_lookups");
 	
-	private @NotNull Function<TriInput<RegistryKey<T>, T, Lifecycle>, Boolean> onIntake = (i)->true;
+	private @NotNull Function<TriInput<Identifier, T, Lifecycle>, Boolean> onIntake = (i)->true;
+	private final Map<Identifier, T> map = new ConcurrentHashMap<Identifier, T>();
 	
-	private BFAPIRegistry(String name) {
+	private Registry(String name) {
 		this(name, null);
 	}
 	
-	private BFAPIRegistry(String name, @Nullable Function<TriInput<RegistryKey<T>, T, Lifecycle>, Boolean> onIntake) {
+	private Registry(String name, @Nullable Function<TriInput<RegistryKey<T>, T, Lifecycle>, Boolean> onIntake) {
 		this(name, onIntake, true);
 	}
 	
-	private BFAPIRegistry(String name, @Nullable Function<TriInput<RegistryKey<T>, T, Lifecycle>, Boolean> onIntake, boolean stable) {
+	private Registry(String name, @Nullable Function<TriInput<RegistryKey<T>, T, Lifecycle>, Boolean> onIntake, boolean stable) {
 		this(ofRegistry(new Identifier(ID, name)), stable?Lifecycle.stable():Lifecycle.experimental(), onIntake);
 	}
 	
-	private BFAPIRegistry(RegistryKey<? extends Registry<T>> key, Lifecycle cycle, @Nullable Function<TriInput<RegistryKey<T>, T, Lifecycle>, Boolean> onIntake) {
-		super(key, cycle);
+	public Registry(In) {
 		if (onIntake!=null) { this.onIntake = onIntake; }
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public <V extends T> @Nullable V add(RegistryKey<T> key, V entry, Lifecycle lifecycle) {
-		if (this.contains(key)) { return (@Nullable V) this.get(key); }
+	public @Nullable RegistryEntry<T> add(RegistryKey<T> key, T entry, Lifecycle lifecycle) {
+		if (this.contains(key)) { return this.getEntry(key).get(); }
 		if (!this.onIntake.apply(TriInput.of(key, entry, lifecycle))) { return null; }
 		return super.add(key, entry, lifecycle);
 	}
