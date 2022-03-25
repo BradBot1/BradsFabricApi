@@ -63,7 +63,9 @@ public final class GameObjects {
 		
 		//IMP: add client side/server side versions that call this, allowing for more modularity n stuffs
 		public static final Event<Input<CommandDispatcher<ServerCommandSource>>> COMMAND_REGISTRATION = new Event<Input<CommandDispatcher<ServerCommandSource>>>("minecraft:command_registration");
-		
+		/**
+		 * @apiNote Currently not implemented, will fix once i rework out how mc reloading works now
+		 */
 		public static final Event<Input<Void>> SERVER_RELOAD = new Event<Input<Void>>("minecraft:server_reload");
 		
 		public static final Event<QuadInput<PlayerEntity, BlockPos, World, Container<Boolean>>> PLAYER_ATTEMPT_MODIFICATION = new Event<QuadInput<PlayerEntity, BlockPos, World, Container<Boolean>>>("minecraft:server_reload");
