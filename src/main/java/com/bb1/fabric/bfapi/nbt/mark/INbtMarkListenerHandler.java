@@ -42,8 +42,8 @@ public class INbtMarkListenerHandler implements EventListener {
 	public void onItemUse(ItemStack usedItemStack, World world, @Nullable BlockPos hitLocation, Field<Entity> usingEntity, Container<Boolean> container) {
 		final Markable markable = getMarkable(usedItemStack);
 		for (final String mark : markable.getMarks()) {
-			BFAPIRegistry.MARK_LISTENER.stream().filter((n)->n.getMark().equals(mark)).forEach((n)->{
-				if (n.onItemUse(usedItemStack, world, hitLocation, usingEntity, container.getValue())) {
+			BFAPIRegistry.MARK_LISTENER.getEntries().stream().filter((n)->n.getValue().getMark().equals(mark)).forEach((n)->{
+				if (n.getValue().onItemUse(usedItemStack, world, hitLocation, usingEntity, container.getValue())) {
 					container.setValue(true);
 				}
 			});
@@ -55,8 +55,8 @@ public class INbtMarkListenerHandler implements EventListener {
 		// FIXME: this is buggy for some reason?
 		final Markable markable = hitEntity.get();
 		for (final String mark : markable.getMarks()) {
-			BFAPIRegistry.MARK_LISTENER.stream().filter((n)->n.getMark().equals(mark)).forEach((n)->{
-				if (n.onEntityHit(hitEntity, world, attackingEntity, usedItemStack, container.getValue())) {
+			BFAPIRegistry.MARK_LISTENER.getEntries().stream().filter((n)->n.getValue().getMark().equals(mark)).forEach((n)->{
+				if (n.getValue().onEntityHit(hitEntity, world, attackingEntity, usedItemStack, container.getValue())) {
 					container.setValue(true);
 				}
 			});
@@ -67,8 +67,8 @@ public class INbtMarkListenerHandler implements EventListener {
 	public void onArmourUsed(ItemStack usedItemStack, World world, @Nullable BlockPos hitLocation, Field<Entity> usingEntity, Container<Boolean> container) {
 		final Markable markable = getMarkable(usedItemStack);
 		for (final String mark : markable.getMarks()) {
-			BFAPIRegistry.MARK_LISTENER.stream().filter((n)->n.getMark().equals(mark)).forEach((n)->{
-				if (n.onArmourUsed(usedItemStack, world, hitLocation, usingEntity, container.getValue())) {
+			BFAPIRegistry.MARK_LISTENER.getEntries().stream().filter((n)->n.getValue().getMark().equals(mark)).forEach((n)->{
+				if (n.getValue().onArmourUsed(usedItemStack, world, hitLocation, usingEntity, container.getValue())) {
 					container.setValue(true);
 				}
 			});

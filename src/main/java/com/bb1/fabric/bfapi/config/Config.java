@@ -1,6 +1,7 @@
 package com.bb1.fabric.bfapi.config;
 
 import static com.bb1.fabric.bfapi.Constants.GSON;
+import static com.bb1.fabric.bfapi.Constants.ID;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -62,9 +63,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
-
-import static com.bb1.fabric.bfapi.Constants.ID;
 
 public class Config {
 	
@@ -311,7 +309,7 @@ public class Config {
 				return  (AbstractConfigSerializable<T>) BFAPIRegistry.CONFIG_SERIALIZER.get(new Identifier("java:boolean_serializer"));
 		}
 		AbstractConfigSerializable<T> bestSerializer = null;
-		for (Entry<RegistryKey<AbstractConfigSerializable<?>>, AbstractConfigSerializable<?>> entry : BFAPIRegistry.CONFIG_SERIALIZER.getEntries()) {
+		for (Entry<Identifier, AbstractConfigSerializable<?>> entry : BFAPIRegistry.CONFIG_SERIALIZER.getEntries()) {
 			AbstractConfigSerializable<?> ser = entry.getValue();
 			final Class<?> clazz = ser.getSerializableClass();
 			if (wantedClazz.equals(clazz)) {

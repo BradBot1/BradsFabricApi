@@ -11,7 +11,6 @@ import com.bb1.fabric.bfapi.registery.IRegisterable;
 import com.bb1.fabric.bfapi.utils.Inputs.Input;
 
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class Event<I extends Input<?>> implements IRegisterable {
 	
@@ -43,7 +42,7 @@ public class Event<I extends Input<?>> implements IRegisterable {
 	
 	@Override
 	public void register(Identifier name) {
-		Registry.register(EVENTS, name, this);
+		EVENTS.add(name, this);
 	}
 	
 }

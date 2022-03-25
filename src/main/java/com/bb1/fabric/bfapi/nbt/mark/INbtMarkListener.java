@@ -12,7 +12,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public interface INbtMarkListener extends IRegisterable {
@@ -33,7 +32,7 @@ public interface INbtMarkListener extends IRegisterable {
 	
 	@Override
 	default void register(@Nullable Identifier name) {
-		Registry.register(MARK_LISTENER, name, this);
+		MARK_LISTENER.add(name, this);
 	}
 	
 }

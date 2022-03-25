@@ -24,7 +24,8 @@ public interface EventListener extends IRegisterable {
 			EventHandler handler = method.getAnnotation(EventHandler.class);
 			if (handler!=null) {
 				method.setAccessible(true);
-				BFAPIRegistry.EVENTS.getOrEmpty(new Identifier(handler.eventIdentifier())).ifPresentOrElse((event)->{
+				Event<?> event = BFAPIRegistry.EVENTS.get(new Identifier(handler.eventIdentifier()));
+				if (event!=null) {
 					if (handler.decomposeArguments()) {
 						event.addHandler((input)->{
 							ExceptionWrapper.execute(input, (i)->{
@@ -48,14 +49,14 @@ public interface EventListener extends IRegisterable {
 							});
 						});
 					}
-				}, ()->{
+				} else {
 					if (handler.logOnFailedBinding()) {
 						LOGGER.warn("Failed to bind to the event '"+handler.eventIdentifier()+"'! Is it not present?");
 					}
 					if (handler.required()) {
 						throw new IllegalStateException("Cannot continue as the event '"+handler.eventIdentifier()+"' is desginated as required");
 					}
-				});
+				}
 			}
 		}
 	}

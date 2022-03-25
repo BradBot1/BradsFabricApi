@@ -26,7 +26,6 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class SimplePermissionDatabase implements IPermissionDatabase {
 	
@@ -109,7 +108,7 @@ public class SimplePermissionDatabase implements IPermissionDatabase {
 
 	@Override
 	public void register(@Nullable Identifier name) {
-		Registry.register(PERMISSION_DATABASES, this.id, this);
+		PERMISSION_DATABASES.add(this.id, this);
 	}
 
 }

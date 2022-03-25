@@ -7,13 +7,12 @@ import org.jetbrains.annotations.Nullable;
 import com.bb1.fabric.bfapi.registery.IRegisterable;
 
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public record Permission(String node, PermissionLevel level) implements IRegisterable {
 
 	@Override
 	public void register(@Nullable Identifier name) {
-		Registry.register(PERMISSIONS, name, this);
+		PERMISSIONS.add(name, this);
 	}
 	
 }

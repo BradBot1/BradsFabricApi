@@ -1,6 +1,8 @@
 package com.bb1.fabric.bfapi.registery;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +45,11 @@ public class SimpleRegistry<T> implements IRegistry<T> {
 	@Override
 	public @NotNull Identifier getIdentifer() {
 		return this.identifier;
+	}
+	
+	@Override
+	public Collection<Entry<Identifier, T>> getEntries() {
+		return this.map.entrySet();
 	}
 	
 }

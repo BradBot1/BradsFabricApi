@@ -87,7 +87,7 @@ public class ShapedCraftingRecipe extends AbstractCraftingRecipe {
 
 	@Override
 	public void register(Identifier name) {
-		Registry.register(RECIPES, name, this);
+		RECIPES.add(name, this);
 	}
 
 	@Override

@@ -17,7 +17,6 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public abstract class AbstractConfigSerializable<O> implements IRegisterable {
 	
@@ -57,7 +56,7 @@ public abstract class AbstractConfigSerializable<O> implements IRegisterable {
 	
 	@Override
 	public void register(@Nullable Identifier name) {
-		Registry.register(CONFIG_SERIALIZER, name==null?this.identifier:name, this);
+		CONFIG_SERIALIZER.add(name==null?this.identifier:name, this);
 	}
 	
 }
